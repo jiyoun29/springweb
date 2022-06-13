@@ -4,9 +4,9 @@ let y = null;
 
 
 //저장 메소드
-function write(){
+function save(){
 
-    let roomname = ${"#roomname"}.val();
+    let roomname = $("#roomname").val();
 
     $.ajax({
         url : "/room/write",

@@ -25,7 +25,7 @@ public class RoomController {
         //templates -> room 안에 -> write.html
     }
 
-    @PutMapping("/write") //2.등록 처리
+    @PostMapping("/write") //2.등록 처리
     @ResponseBody //객체반환 / 템플릿이 아닌 객체 반환시 사용되는 어노테이션
     public boolean write_save(RoomDto roomDto){
         //요청변수 중 dto 필드와 변수 명이 동일할 경우 자동 주입
@@ -57,8 +57,7 @@ public class RoomController {
 
     @GetMapping("/roomlist")
     public void roomlist(HttpServletResponse response) {
-        JSONObject object = new JSONObject();
-//        JSONArray jsonArray = roomService.room_list();
+        JSONObject object = roomService.room_list();
 
   //      object.put("positions" , jsonArray);
 

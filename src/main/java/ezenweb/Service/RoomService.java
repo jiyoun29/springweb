@@ -45,8 +45,8 @@ public class RoomService {
             JSONObject object = new JSONObject();
 
             object.put("rname", roomEntity.getRoomname());
-            object.put("Ing", roomEntity.getX());
-            object.put("Iat", roomEntity.getY());
+            object.put("lng", roomEntity.getX());
+            object.put("lat", roomEntity.getY());
 
             jsonArray.put(object);
 

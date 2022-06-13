@@ -21,7 +21,7 @@
     // 데이터를 가져오기 위해 jQuery를 사용합니다
     // 데이터를 가져와 마커를 생성하고 클러스터러 객체에 넘겨줍니다
         //$.get("통신할 URL", function(반환인수))
-    $.get("/room/room_list", function(data) { //매핑생성****필요****
+    $.get("/room/roomlist", function(data) { //매핑생성****필요****
 //        console.log(data); //통신확인
 
         // 데이터에서 좌표 값을 가지고 마커를 표시합니다
