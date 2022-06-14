@@ -1,17 +1,24 @@
 //전역변수로 임의의 값
-let x = null;
-let y = null;
+//let x = null;
+//let y = null;
 
 
 //저장 메소드
 function save(){
+//    let roomname = $("#roomname").val();
 
-    let roomname = $("#roomname").val();
+//1. 폼 가져오기
+    let form = $("#saveform")[0]; //인덱스 [] 넣지 않으면 설정값까지 가져오므로 인덱스 가져오기
+    let formdata = new FormData(form);
 
     $.ajax({
         url : "/room/write",
         method : "POST",//putmapping : 등록, 세이브에 자주 사용 (get은 이동)
-        data : { "roomname" : roomname , "x":x , "y":y },
+        data : formdata ,
+            // { "roomname" : roomname , "x":x , "y":y },
+            //첨부파일 보내려면 컨텐츠 타입 추가
+        contentType : false, //첨부파일 전송시 사용되는 속성
+        processData : false, //true 넣으면 문자열이 날아간다.
         success : function(re){
             alert("java와 통신 성공");
         }
@@ -55,8 +62,8 @@ function save(){
                         // 해당 주소에 대한 좌표를 받아서
                         var coords = new daum.maps.LatLng(result.y, result.x);
                                 // 해당 좌표를 전역변수로 이동
-                                x = result.x;
-                                y = result.y;
+                                $("#x").val(result.x);
+                                $("#y").val(result.y);
 
                         // 지도를 보여준다.
                         mapContainer.style.display = "block";
