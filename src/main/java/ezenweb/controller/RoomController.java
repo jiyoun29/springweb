@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/room")
@@ -33,42 +35,43 @@ public class RoomController {
 //        public boolean write_save(@RequestParam("roomname") String roomname ,
 //                @RequestParam("x") String x ,
 //                @RequestParam("y") String y){ //RequestParam으로 변수 요청
-//
 //            //dto 생성
 //            RoomDto roomDto = RoomDto.builder()
 //                    .roomname(roomname)
 //                    .x(x).y(y)
 //                    .build();
-        
+
         //service에 dto 전달
         roomService.room_save(roomDto);
 
-//        System.out.println("입력값"+roomDto.toString());
+//        System.out.println(roomDto.getRimg().get(0));
 
         return true;
     }
-
+//
     //3.방 목록 페이지 이동
     @GetMapping("/list")
-    public String list() {
+    public String list() {return "room/list";}
 
-        return "room/list";
-    }
+    @PostMapping("/roomlist")
+    @ResponseBody //객체반환
+    public Map<String, List<Map<String, String>>>
+            room_list(@RequestBody Map<String, String> Location ){
+                      //인수받기
+        System.out.print(Location);
 
-    @GetMapping("/roomlist")
-    public void roomlist(HttpServletResponse response) {
-        JSONObject object = roomService.room_list();
-
-  //      object.put("positions" , jsonArray);
-
-        try {
-            response.setCharacterEncoding("UTF-8");
-            response.setContentType("application/json");
-            response.getWriter().print(object);
-        } catch (Exception e){}
-
+        //바로 리턴해서 사용
+        return roomService.room_list(Location);
 
     }
+
+
+//    public void roomlist(HttpServletResponse response) {
+//        JSONObject object = roomService.room_list();
+//      object.put("positions" , jsonArray);
+//        try {  response.setCharacterEncoding("UTF-8");
+//            response.setContentType("application/json");
+//            response.getWriter().print(object); } catch (Exception e){}}
 
 
 
@@ -87,10 +90,22 @@ public class RoomController {
     view ----> controller 변수 요청 방식
         1. HttpServletRequest request를 써서 String roomname = request.getParameter("roomname") 으로 요청
         2. @RequestParam("roomname") String roomname 으로 요청(단, 변수 모두 적어야 한다.)
+        2-1. @RequestBody : JS -> controller 일때
         3. mapping 사용 시 DTO로 자동 주입 된다. <여러개 쓸 때에는 해당 mapping 사용>
             조건1 : Mapping
             조건2 : 요청변수명과 DTO 필드명이 동일한다.
-            
+        * 자료형이 다르고 판단이 어려울때 자동 형변환을 한다.(2번)
+
+
+    controller ----> view(JS)
+        1. 해당 클래스가 @RestController 이면 Return 가능(객체 전송 가능)
+            vs 그냥 @Controller이면 메소드 return 값이 템플릿(html)
+        2. HttpServletResponse response
+            response.getWriter().print() <-어노테이션이 얻는 방식
+        3. 어노테이션 사용. @ResponseBody (RestController이랑 같이 쓸 필요x)
+            통째로 RestController을 쓰자. <- RequestMapping이 상위버전
+            메소드 return 객체
+
 
 
  */

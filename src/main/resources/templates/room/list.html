@@ -6,8 +6,20 @@
 </head>
 <body>
 
+<div th:replace="header.html :: header"></div>
 
-<div id="map" style="width:100%;height:350px;"></div>
+
+    <div class="row">
+        <div class="col-md-9">
+            <!--지도-->
+            <div id="map" style="width:100%;height:1000px;"></div>
+        </div>
+        <div class="col-md-3" id="sidebar"> <!--사이드바로 사용 -->
+
+        </div>
+    </div>
+
+
 
 
 <script  src="http://code.jquery.com/jquery-latest.min.js"></script>

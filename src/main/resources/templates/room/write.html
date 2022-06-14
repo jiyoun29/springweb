@@ -5,15 +5,47 @@
     <title>write</title>
 </head>
 <body>
+<div th:replace="header.html :: header"></div>
+
 
     <h3> room 등록 </h3>
-    <form>
-        이름 : <input type="text" id="roomname">
+    <form id="saveform"> <!-- action="/room/write" method="post" entype="multipart/form"-->
+        <!-- dto로 자동주입을 할 경우에는 input name과 dto 필드명 동일하게 -->
+        이름 : <input type="text" name="rname"> <br>
+        사진 : <input type="file" multiple="multiple" name="rimg"><br>
+            x : <input type="input" name="x" id="x" width="40px">
+            y : <input type="input" name="y" id="y" width="40px"> <br>
         지역 :
-        <input type="text" id="sample5_address" placeholder="주소">
+        <input type="text" id="sample5_address" placeholder="주소"><br>
         <input type="button" onclick="sample5_execDaumPostcode()" value="주소 검색"><br>
         <div id="map" style="width:300px;height:300px;margin-top:10px;display:none"></div>
+        <br>
 
+        거래방식 :  <input type="radio" name="rsell" value="sellyear">전세
+        <input type="radio" name="rsell" value="sellmonth">월세
+        <input type="radio" name="rsell" value="sellhome">매매<br>
+        가격 : <input type="text" placeholder="단위 : 만원" name="rprice"><br>
+        면적 : <input type="text" placeholder="단위 : 평" name="rarea"><br>
+        관리비 : <input type="text" placeholder="단위 : 원" name="rcost"><br>
+        구조 : <input type="radio" name="rplace" value="all"> 전체
+            <input type="radio" name="rplace" value="open">오픈형(방1)
+            <input type="radio" name="rplace" value="another">분리형(방1,거실1)
+            <input type="radio" name="rplace" value="up">복층형<br>
+        준공날짜 : <input type="text" placeholder="20xx-xx-xx 형식으로 기입" name="rcondate"> <br>
+        주차여부 : <input type="radio" name="rcar" value="caryes"> 가능
+        <input type="radio" name="rcar" value="carno">불가능<br>
+        입주가능일 : <input type="text" placeholder="20xx-xx-xx 형식으로 기입" name="rmove"> <br>
+        층/건물층수 : <input type="text" name="rfloors"><br>
+        건물종류: <input type="radio" name="rbuilding" value="apart">아파트
+        <input type="radio" name="rbuilding" value="tworoom">빌라,투룸+
+        <input type="radio" name="rbuilding" value="oneroom">원룸
+        <input type="radio" name="rbuilding" value="opi">오피스텔
+        <input type="radio" name="rbuilding" value="startup">창업/사무실<br>
+        주소 : <input type="text" placeholder="주소를 입력해주세요." name="raddress"> <br>
+        상세설명 <textArea type="text" width="150px" name="rcontent"></textArea> <br>
+
+
+        <br> <br>
         <button type="button" onclick="save()"> 등록 </button>
     </form>
 
