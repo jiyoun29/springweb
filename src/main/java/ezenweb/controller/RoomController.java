@@ -40,7 +40,7 @@ public class RoomController {
 //                    .roomname(roomname)
 //                    .x(x).y(y)
 //                    .build();
-
+System.out.println(roomDto.getRtitle());
         //service에 dto 전달
         roomService.room_save(roomDto);
 
@@ -63,6 +63,30 @@ public class RoomController {
         //바로 리턴해서 사용
         return roomService.room_list(Location);
 
+    }
+
+    @GetMapping("/getroom")
+    public JSONObject getroom(@RequestParam("rno") int rno,
+                              HttpServletResponse response){
+        //값 1개를 요청할때 requestparam. body는 여러개
+        //rno을 요청해서 rno로 받음
+
+        //예외처리
+        try{
+            JSONObject object = roomService.getroom(rno);
+
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json");
+
+            response.getWriter().println(object); //오브젝트 보내기
+
+        } catch (Exception e){System.out.print(e);}
+
+
+        //찍히는지 확인
+//        roomService.getroom(rno);
+//        System.out.println(rno);
+        return null;
     }
 
 
@@ -106,7 +130,4 @@ public class RoomController {
             통째로 RestController을 쓰자. <- RequestMapping이 상위버전
             메소드 return 객체
 
-
-
  */
-

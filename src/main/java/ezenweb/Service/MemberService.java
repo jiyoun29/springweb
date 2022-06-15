@@ -1,8 +1,8 @@
 package ezenweb.Service;
 
 import ezenweb.Dto.MemberDto;
-import ezenweb.domain.MemberEntity;
-import ezenweb.domain.MemberRepository;
+import ezenweb.domain.member.MemberEntity;
+import ezenweb.domain.member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

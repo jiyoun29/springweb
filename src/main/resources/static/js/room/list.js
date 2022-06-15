@@ -52,7 +52,7 @@
 
     //6. 마커 이미지 변경
     // 마커 이미지의 주소
-    var markerImageUrl = 'http://localhost:8081/img/4481380.png',
+    var markerImageUrl = 'http://192.168.17.148:8081/img/4481380.png',
         markerImageSize = new kakao.maps.Size(40, 42), // 마커 이미지의 크기
         markerImageOptions = {
             offset : new kakao.maps.Point(20, 42)// 마커 좌표에 일치시킬 이미지 안의 좌표
@@ -93,22 +93,22 @@
 
             //마커 하나 생성
             var marker = new kakao.maps.Marker({
-                  position : new kakao.maps.LatLng(position.lat, position.lng) ,
+                  position : new kakao.maps.LatLng(position.rlon, position.rlat) ,
                    image : markerImage // 마커의 이미지
               });
 
                 // 마커에 클릭 이벤트를 등록한다 (우클릭 : rightclick)
                 kakao.maps.event.addListener(marker, 'click', function() {
-                    alert('룸이름: '+position.rname);
-                });
+                    getroom(position.rno);
+               });
 
                 //사이드바에 추가할 html 구성
                 html +=
-                    '<div class="row"> <div class="col-md-6">'+
-                            '<img src="/uploads/'+position.rimg+'" width="100%">'+
+                    '<div class="row" onclick="getroom('+position.rno+')"> <div class="col-md-6">'+
+                            '<img src="/upload/'+position.rimg+'" width="100%">'+
                        '</div>  <div class="col-md-6">'+
                            '<div>집번호 : <span>'+position.rno+'</span></div> <br>'+
-                            '<div>집이름 :<span>'+position.rname+'</span> </div><br></div> </div>';
+                            '<div>집이름 :<span>'+position.rtitle+'</span> </div><br></div> </div>';
 
                 return marker; //변수 만들고 리턴
            //마커 하나 생성 end
@@ -155,3 +155,38 @@
 
 
 }); //현재 내 위치의 위도,경도 구하기 and
+
+
+//모달에 특정 방 정보 출력 메소드
+//메소드화
+function getroom(rno){
+
+     //해당 모달에 데이터 넣기
+        $.ajax({
+            url : "/room/getroom",
+            method : "GET",
+            data : {"rno":rno},
+            success : function(room){
+                    let imgtag = "";
+                //응답 받은 데이터를 모달 데이터에 넣기
+                console.log(room.rimglist);
+
+                for(let i = 0 ; i<room.rimglist.length ; i++){
+                    //반복문 돌면서 div 추가
+                    if(i == 0){ //첫번째 이미지에 active 속성 추가
+                        imgtag +=
+            '<div class="carousel-item active">'+
+            '<img src="/upload/'+room.rimglist[i]+'" class="d-block w-100" alt="..."> </div>';
+                    } else{
+                        imgtag +=
+             '<div class="carousel-item">'+
+             '<img src="/upload/'+room.rimglist[i]+'" class="d-block w-100" alt="..."> </div>';
+                     }
+            }
+      $("#modalimglist").html( imgtag );
+                             // 모달 띄우기
+                             $("#modalbtn2").click();
+            }
+        });
+
+}

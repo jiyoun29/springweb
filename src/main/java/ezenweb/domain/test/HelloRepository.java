@@ -1,4 +1,4 @@
-package ezenweb.domain;
+package ezenweb.domain.test;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
