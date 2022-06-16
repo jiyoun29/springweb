@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" th:fragment="header">
+<html lang="en" th:fragment="header" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>헤더</title>
@@ -11,11 +11,9 @@
 <body>
   <h3>헤더</h3>
   <a href="/">메인</a> <!-- href="url"  controll 클래스 내 @get매핑("url")으로 이동-->
-
-
-  <a href="/room/write">등록</a>
+  <a href="/room/write">등록</a> <!--a태그는 기본적으로 get 방식. a태그 잡을때에는 controll에서 GetMapping한다.-->
   <a href="/room/list">지도보기</a>
-
+  <a href="/member/signup">회원가입</a>
 
 
 

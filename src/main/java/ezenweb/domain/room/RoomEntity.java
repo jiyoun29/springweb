@@ -1,5 +1,7 @@
 package ezenweb.domain.room;
 
+import ezenweb.domain.BaseTime;
+import ezenweb.domain.member.MemberEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,11 +13,11 @@ import java.util.List;
 @AllArgsConstructor  @NoArgsConstructor
 @Builder
 @Table(name = "room") // 테이블 이름 정의
-public class RoomEntity { //Entity : 객체
+public class RoomEntity extends BaseTime { //Entity : 객체
 
     //@Id : 기본값. pk값
     // @GeneratedValue(strategy = GenerationType.IDENTITY) :  auto키로 추가
-    @Id
+    @Id //pk
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int rno;    //방번호 (pk, ak)
     private String rtitle; //방 타이틀
@@ -48,4 +50,9 @@ public class RoomEntity { //Entity : 객체
     private List<RoomimgEntity> roomimgEntitylist = new ArrayList<>(); //메모리 할당
 
 
+    @ManyToOne
+    @JoinColumn(name = "mno") //필드명 지정
+    private MemberEntity memberEntity;
+
 }
+

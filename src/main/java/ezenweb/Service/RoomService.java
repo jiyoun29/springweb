@@ -1,6 +1,9 @@
 package ezenweb.Service;
 
+import ezenweb.Dto.LoginDto;
 import ezenweb.Dto.RoomDto;
+import ezenweb.domain.member.MemberEntity;
+import ezenweb.domain.member.MemberRepository;
 import ezenweb.domain.room.RoomEntity;
 import ezenweb.domain.room.RoomRepository;
 import ezenweb.domain.room.RoomimgEntity;
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.util.*;
@@ -25,9 +29,22 @@ public class RoomService {
     @Autowired
     private RoomimgRepository roomimgRepository;
 
+    @Autowired
+    private HttpServletRequest request;
+    @Autowired
+    private MemberRepository memberRepository;
+
+
+
+
     //room 저장
     @Transactional
     public boolean room_save(RoomDto roomDto){
+        //현재 로그인 된 세션 호출
+        LoginDto loginDto = (LoginDto) request.getSession().getAttribute("login");
+        // 현재 로그인 회원의 엔티티 찾기
+        MemberEntity memberEntity = memberRepository.findById(loginDto.getMno()).get();
+
 
         //dto -> entity 변환
 //        RoomEntity roomEntity = RoomEntity.builder()
@@ -36,7 +53,7 @@ public class RoomService {
 //                .rlon(roomDto.getRlon())
 //                .build();
         //여러번 사용하기 위해 가져옴
-        RoomEntity roomEntity = roomDto.toentity();
+        RoomEntity roomEntity = roomDto.toentity(); //1. 객체 생성
                                             //자동으로 dto-> entity 변환 라이브러리 (안씀)
                                             //ModelMapper
                                     //        ModelMapper modelMapper = new ModelMapper();
@@ -44,8 +61,13 @@ public class RoomService {
 
 
         //저장이 제일 중요**
-        //2. 저장. 우선적으로 룸 db에 저장한다. [pk저장]
+        //2. 저장. 우선적으로 룸 db에 저장한다. [pk저장] 해당 객체 매핑 []
         roomRepository.save(roomEntity);
+
+            //현재 로그인된 엔티티를 찾아서 룸에 저장
+            roomEntity.setMemberEntity(memberEntity);
+            //현재 로그인된 회원 엔티티내 룸 리스트에 룸 엔티티 추가
+            memberEntity.getRoomEntityList().add(roomEntity);
 
 
         //3. 입력받은 첨부파일을 저장한다.
@@ -223,6 +245,45 @@ public class RoomService {
 //        System.out.println(object);//확인
         return object;
     }
+
+    /////////////////////////////////////////////////////////////
+
+    //현재 로그인된 회원이 등록한 방 목록 호출
+    public JSONArray myroomlist(){
+        JSONArray jsonArray = new JSONArray();
+
+        //현재 로그인된 회원 엔티티 찾기
+        LoginDto loginDto = (LoginDto) request.getSession().getAttribute("login");
+        MemberEntity memberEntity = memberRepository.findById(loginDto.getMno()).get();
+        //찾은 회원 엔티티의 방 목록 json형으로 반환
+        for(RoomEntity entity : memberEntity.getRoomEntityList()){
+            JSONObject object = new JSONObject();//빼오기
+            object.put("rno",entity.getRno());
+            object.put("rtitle",entity.getRtitle());
+            object.put("rimg",entity.getRoomimgEntitylist().get(0).getRimg());
+            object.put("rdate",entity.getModifiedate()); //baseTime에 Getter추가해서 빼내옴
+            jsonArray.put(object);
+        }
+        return jsonArray;
+    }
+
+
+    //룸 삭제 메소드
+    @Transactional
+    public boolean delete(int rno){
+        RoomEntity roomEntity = roomRepository.findById(rno).get();
+        if(roomEntity != null){//만일 entity가 없으면
+            //해당 엔티티를 삭제
+            roomRepository.delete(roomEntity);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+
+
 
 
 }

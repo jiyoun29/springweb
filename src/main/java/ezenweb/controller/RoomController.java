@@ -97,6 +97,32 @@ System.out.println(roomDto.getRtitle());
 //            response.setContentType("application/json");
 //            response.getWriter().print(object); } catch (Exception e){}}
 
+//////////////////////////////////////////
+
+
+    //내룸리스트
+    @GetMapping("/myroomlist")
+    public void myroomlist(HttpServletResponse response){
+        try {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().print(roomService.myroomlist());
+        } catch (Exception e){System.out.println(e);}
+    }
+
+
+    //룸삭제 매핑
+    @DeleteMapping("/delete")
+    @ResponseBody
+    public boolean delete(@RequestParam("rno") int rno){
+        return roomService.delete(rno);
+    }
+
+
+
+
+
+
 
 
 }

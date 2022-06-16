@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>My room</title>
+</head>
+<body>
+<div th:replace="header.html::header"></div>
+
+    <div class="container">
+        <h3>회원님이 등록한 방 리스트</h3>
+
+        <table id="myroomtable"> <!--값 뿌려주기-->
+
+        </table>
+
+    </div>
+
+<script src="/js/member/myroom.js"></script>
+<div th:replace="footer.html :: footer"></div>
+</body>
+</html>

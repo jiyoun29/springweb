@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>delete</title>
+</head>
+<body>
+<div th:replace="header.html :: header"></div>
+
+    <h3>회원탈퇴</h3>
+
+    <form>
+        비밀번호 확인 <input type="text" id="mpw"> <br>
+        <button type="button" onclick="member_delete()">회원탈퇴</button>
+    </form>
+
+<script src="/js/member/delete.js"></script>
+<div th:replace="footer.html :: footer"></div>
+</body>
+</html>

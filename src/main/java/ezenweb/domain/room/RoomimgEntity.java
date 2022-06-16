@@ -1,5 +1,6 @@
 package ezenweb.domain.room;
 
+import ezenweb.domain.BaseTime;
 import lombok.*;
 
 import javax.persistence.*;
@@ -7,7 +8,7 @@ import javax.persistence.*;
 @Getter  @Setter  @ToString
 @AllArgsConstructor @NoArgsConstructor @Builder
 @Entity @Table(name = "rooming")
-public class RoomimgEntity {
+public class RoomimgEntity extends BaseTime {
 
     //연결
         //pk번호

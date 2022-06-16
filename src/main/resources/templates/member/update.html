@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>멤버 업데이트</title>
+</head>
+<body>
+<div th:replace="header.html::header"></div>
+
+    <form > <!-- put 지원x-->
+<!--        <input type="hidden" name="_method" value="put"> -->
+        수정할 이름 : <input type="text" id = "mname">
+        <button type="button" onclick="update()">수정</button>
+    </form>
+
+<script src="/js/member/update.js"></script>
+<div th:replace="footer.html :: footer"></div>
+
+</body>
+</html>
