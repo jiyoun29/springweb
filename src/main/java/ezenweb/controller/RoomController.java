@@ -43,9 +43,7 @@ public class RoomController {
 System.out.println(roomDto.getRtitle());
         //service에 dto 전달
         roomService.room_save(roomDto);
-
 //        System.out.println(roomDto.getRimg().get(0));
-
         return true;
     }
 //
@@ -117,12 +115,6 @@ System.out.println(roomDto.getRtitle());
     public boolean delete(@RequestParam("rno") int rno){
         return roomService.delete(rno);
     }
-
-
-
-
-
-
 
 
 }
