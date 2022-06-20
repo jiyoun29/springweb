@@ -13,6 +13,9 @@
   <a href="/">메인</a> <!-- href="url"  controll 클래스 내 @get매핑("url")으로 이동-->
   <a th:if="${session.login != null}" href="/room/write">등록</a> <!--a태그는 기본적으로 get 방식. a태그 잡을때에는 controll에서 GetMapping한다.-->
   <a href="/room/list">지도보기</a>
+  <a href="/board/list">자유게시판</a>
+
+
   <span th:if="${session.login != null}" th:text="${session.login}"></span>
   <a th:if="${session.login != null}" href="/member/info">회원정보</a>
   <a th:if="${session.login != null}" href="/member/logout">로그아웃</a>

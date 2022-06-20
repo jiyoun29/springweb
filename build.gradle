@@ -29,8 +29,8 @@ dependencies {
 
     annotationProcessor 'org.projectlombok:lombok'  // 롬복 라이브러리[ 실행 라이브러리 ]
     compileOnly 'org.projectlombok:lombok'           // 롬복 라이브러리 [ 작성 라이브러리 ]
-//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation group: 'org.json', name: 'json', version: '20220320'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test' //테스트관련 어노테이션 제공
+    implementation group: 'org.json', name: 'json', version: '20220320'//json라이브러리
 
     //dto->entity ->dto (전제조건: 필드명 동일)
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'

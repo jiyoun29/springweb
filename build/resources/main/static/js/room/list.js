@@ -6,12 +6,13 @@
     navigator.geolocation.getCurrentPosition(function(position) {
         var lat = position.coords.latitude, // 위도
             lon = position.coords.longitude; // 경도
-    //전부 감싸기
+    //전부 감싸기 (지금 잠깐 닫음 열려면 맨 아래에 } 넣기)
+//배포에서는 0번 삭제, 1번의 lat lon에 좌표 임시로 넣기
 
 
 //1.log map 변수
  var map = new kakao.maps.Map(document.getElementById('map'), { // 지도를 표시할 div
-        center : new kakao.maps.LatLng(lat, lon), // 지도의 중심좌표 //현재 접속된 디바이스 좌표
+        center : new kakao.maps.LatLng(lat , lon), // 지도의 중심좌표 //현재 접속된 디바이스 좌표 37.334659113378, 126.85837456757
         level : 5 // 지도의 확대 레벨
     });
 
@@ -52,7 +53,7 @@
 
     //6. 마커 이미지 변경
     // 마커 이미지의 주소
-    var markerImageUrl = 'http://192.168.17.148:8081/img/4481380.png',
+    var markerImageUrl = 'http://localhost:8081/img/4481380.png', //배포시 배포주소로 바꾸기
         markerImageSize = new kakao.maps.Size(40, 42), // 마커 이미지의 크기
         markerImageOptions = {
             offset : new kakao.maps.Point(20, 42)// 마커 좌표에 일치시킬 이미지 안의 좌표
@@ -108,7 +109,8 @@
                             '<img src="/upload/'+position.rimg+'" width="100%">'+
                        '</div>  <div class="col-md-6">'+
                            '<div>집번호 : <span>'+position.rno+'</span></div> <br>'+
-                            '<div>집이름 :<span>'+position.rtitle+'</span> </div><br></div> </div>';
+                           '<div>집이름 :<span>'+position.rtitle+'</span> </div><br>'
+                    +'</div> </div>';
 
                 return marker; //변수 만들고 리턴
            //마커 하나 생성 end
@@ -189,4 +191,3 @@ function getroom(rno){
             }
         });
 
-}

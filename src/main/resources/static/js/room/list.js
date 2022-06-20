@@ -53,7 +53,7 @@
 
     //6. 마커 이미지 변경
     // 마커 이미지의 주소
-    var markerImageUrl = 'http://192.168.17.148:8081/img/4481380.png', //배포시 배포주소로 바꾸기
+    var markerImageUrl = 'http://localhost:8081/img/4481380.png', //배포시 배포주소로 바꾸기
         markerImageSize = new kakao.maps.Size(40, 42), // 마커 이미지의 크기
         markerImageOptions = {
             offset : new kakao.maps.Point(20, 42)// 마커 좌표에 일치시킬 이미지 안의 좌표
