@@ -2,7 +2,6 @@ board_get();
 
 //1. 특정 게시물 호출
 function board_get(){
-alert("연결");
     $.ajax({
         url : '/board/getboard',
         success : function(board){

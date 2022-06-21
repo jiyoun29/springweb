@@ -23,12 +23,18 @@ public class BoardController {
     private BoardService boardService;
         //2. 서비스 호출을 위한 boardService 객체 생성
 
+
+
+
+
     /////////////////view 열기[템플릿 열기] 매핑//////////////////
     //1. 게시판 페이지 열기
     @GetMapping("/list") //페이지 여는 것들 : get
     public String list(){
         return "board/list";
     }
+
+
 
 //    int selectbno = 0; // view 메소드와 getboard 메소드에서 사용된 변수
 
@@ -54,17 +60,22 @@ public class BoardController {
     }
 
 
+
+
     //3. 게시물 수정 페이지
     @GetMapping("/update")
     public String update(){
         return "board/update";
     }
-    
+
+
     //4. 게시물 쓰기 페이지
     @GetMapping("/save")
     public String save(){
         return "board/save";
     }
+
+
 
     /////////////////service 호출(처리) 매핑//////////////////
     //1. C : 게시물 저장 메소드
@@ -78,13 +89,16 @@ public class BoardController {
         //보드 서비스에서 디티오를 꺼내고 결과물을 리턴
     }
 
+
     //2. R 모든 게시물 출력 처리 메소드
     @GetMapping("/getboardlist")
-    public void getboardlist(HttpServletResponse response){
+    public void getboardlist(HttpServletResponse response ,
+                @RequestParam("cno") int cno){
+
         try {
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
-            response.getWriter().println(boardService.getboardlist());
+            response.getWriter().println(boardService.getboardlist( cno ));
         } catch (Exception e) {System.out.println(e);}
     }
 
@@ -102,6 +116,7 @@ public class BoardController {
 
     }
 
+
     //3. U
     @PutMapping("/update")
     @ResponseBody
@@ -111,6 +126,7 @@ public class BoardController {
         return boardService.update(boardDto);
     }
 
+
     //4. D
     @DeleteMapping("/delete")
     @ResponseBody
@@ -118,7 +134,29 @@ public class BoardController {
         return boardService.delete(bno);
     }
 
+
+
+
+    //카테고리 출력 메소드
+    @GetMapping("/getcategorylist")
+    public void getcategorylist(HttpServletResponse response) {
+        try {
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json");
+            response.getWriter().print(boardService.getcategorylist());
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+    }
+
+
+
+
+
+
 }
+
 
 /////////////////////////
 /*

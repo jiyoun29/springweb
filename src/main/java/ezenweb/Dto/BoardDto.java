@@ -13,6 +13,8 @@ public class BoardDto {
     private String bcontent;    //내용
     private int bview;          //조회수
     private int blike;          //좋아요
+    
+    private String category; //카테고리
 
     //Dto->Entity
     public BoardEntity toentity() {

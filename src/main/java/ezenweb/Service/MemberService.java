@@ -73,7 +73,7 @@ public class MemberService {
     //2. 회원가입처리 메소드
     public boolean signup(MemberDto memberDto){
         //dto -> entity [ 이유 : Dto는 DB로 들어갈 수 없다 ]
-        MemberEntity memberEntity = memberDto.toentity();
+        MemberEntity memberEntity = memberDto.toentitiy();
             //dto에 builder 만들었으므로 dto에서 호출한다.
 
         //entity 저장
