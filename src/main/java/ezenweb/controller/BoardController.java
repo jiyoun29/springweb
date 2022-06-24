@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/board")
-public class BoardController {
+public class BoardController  {
 
     @Autowired
     private HttpServletRequest request;
@@ -91,17 +91,21 @@ public class BoardController {
 
 
     //2. R 모든 게시물 출력 처리 메소드
+    // 2. R : 모든 게시물 출력 메소드
     @GetMapping("/getboardlist")
-    public void getboardlist(HttpServletResponse response ,
-                @RequestParam("cno") int cno){
+    public void getboardlist(
+            HttpServletResponse response ,
+            @RequestParam("cno") int cno ,
+            @RequestParam("key") String key ,
+            @RequestParam("keyword") String keyword ,
+            @RequestParam("page") int page  ){
 
         try {
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
-            response.getWriter().println(boardService.getboardlist( cno ));
-        } catch (Exception e) {System.out.println(e);}
+            response.getWriter().println(boardService.getboardlist( cno , key , keyword , page ));
+        }catch( Exception e ){ System.out.println( e ); }
     }
-
 
 
     //2. 개별 조회 출력 메소드

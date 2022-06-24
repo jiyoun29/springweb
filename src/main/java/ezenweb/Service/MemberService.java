@@ -5,14 +5,58 @@ import ezenweb.Dto.MemberDto;
 import ezenweb.domain.member.MemberEntity;
 import ezenweb.domain.member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class MemberService {
+public class MemberService implements UserDetailsService {
+                        //UserDetailsService 인터페이스 [ 추상 메소드 존재 ]
+
+    /*
+    1. 로그인 서비스 제공 메소드
+    2. 패스워드 검증x [ 시큐리티 제공 ]
+    3. 아이디만 검증 처리
+    **/
+    @Override
+    public UserDetails loadUserByUsername(String mid) throws UsernameNotFoundException {
+        
+        System.out.println(mid); //넘어오는지 테스트
+
+        //1. 회원 아이디로 엔티티 찾기
+        Optional<MemberEntity> entityOptional = memberRepository.findBymid( mid );
+        MemberEntity memberEntity = entityOptional.orElse(null);
+                    /*Optional 클래스 [null 관련 오류 방지]
+                        1. optional.isPresent() : null 아니면
+                        2. .orElse : 만약에 optional객체가 비어있으면 반환할 데이터
+                        만약 엔티티가 없으면 null 반환
+                     */
+        //2. 찾은 회원 엔티티의 권한[키]를 리스트에 담기
+        List<GrantedAuthority> authorityList = new ArrayList<>();
+                //GrantedAuthority : 부여된 인증의 클래스
+                //List<GrantedAuthority> : 부여된 인증들을 모아두기
+
+        System.out.println("권한 키:"+memberEntity.getrolekey());
+
+
+
+        authorityList.add(new SimpleGrantedAuthority(memberEntity.getrolekey()));
+            //리스트에 인증된 엔티티의 키를 보관
+
+        return new LoginDto(memberEntity, authorityList); //회원 엔티티, 인증된 리스트 세션 부여
+    }
+
+
+    //서비스 구역 : 로직 / 트랙잭션
 
     //메모리 할당
     @Autowired //자동 빈(메모리) 생성 // @Autowired vs new
@@ -22,33 +66,32 @@ public class MemberService {
     @Autowired
     HttpServletRequest request; //세션 사용을 위한 request 객체 선언
 
-    //로직 / 트랙잭션
-    //1. 로그인처리 메소드
-    public boolean login(String mid, String mpw){
-
-        //1. sql 없이 java로 처리, 모든 엔티티 호출[java처리 조건처리]
-        List<MemberEntity> memberEntityList = memberRepository.findAll();
-
-        //2. 모든 엔티티 리스트에서 입력받은 데이터와 비교한다.
-        for(MemberEntity entity : memberEntityList){
-            //3. 아이디와 비밀번호가 동일하면
-            if(entity.getMid().equals(mid) && entity.getMpw().equals(mpw)){
-
-                //로그인 세션에 사용될 dto 생성
-                LoginDto logindto = LoginDto.builder()
-                    .mno(entity.getMno())
-                    .mid(entity.getMid())
-                    .mname(entity.getMname())
-                    .build();
-
-                //세션 객체 호출                      //entity 대신 dto 삽입
-                request.getSession().setAttribute("login", logindto ); //mid는 변수니까 "" 사용 x
-                                                //세션 이름, 데이터
-                return true; //4.로그인 성공
-            }
-        }
-        return false; //4.로그인 실패
-    }
+    //1. 로그인처리 메소드 [ 시큐리티 사용 전 로그인 ]
+//    public boolean login(String mid, String mpw){
+//
+//        //1. sql 없이 java로 처리, 모든 엔티티 호출[java처리 조건처리]
+//        List<MemberEntity> memberEntityList = memberRepository.findAll();
+//
+//        //2. 모든 엔티티 리스트에서 입력받은 데이터와 비교한다.
+//        for(MemberEntity entity : memberEntityList){
+//            //3. 아이디와 비밀번호가 동일하면
+//            if(entity.getMid().equals(mid) && entity.getMpw().equals(mpw)){
+//
+//                //로그인 세션에 사용될 dto 생성
+//                LoginDto logindto = LoginDto.builder()
+//                    .mno(entity.getMno())
+//                    .mid(entity.getMid())
+//                    .mname(entity.getMname())
+//                    .build();
+//
+//                //세션 객체 호출                      //entity 대신 dto 삽입
+//                request.getSession().setAttribute("login", logindto ); //mid는 변수니까 "" 사용 x
+//                                                //세션 이름, 데이터
+//                return true; //4.로그인 성공
+//            }
+//        }
+//        return false; //4.로그인 실패
+//    }
     
     
     //3. 로그아웃 메소드

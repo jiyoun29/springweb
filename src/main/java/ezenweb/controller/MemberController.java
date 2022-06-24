@@ -22,24 +22,23 @@ public class MemberController {
 
 
     //3. 로그인 처리 매핑
-    @PostMapping("/login")
-    @ResponseBody
-    public boolean save(@RequestParam("mid") String mid ,@RequestParam("mpw") String mpw){
+//    @PostMapping("/login")
+//    @ResponseBody
+//    public boolean save(@RequestParam("mid") String mid ,@RequestParam("mpw") String mpw){
+////        System.out.println(mid+ mpw);
+//        //dto가 아닌 개별적으로 받아옴
+//        return memberService.login(mid, mpw);
+//    }
 
-//        System.out.println(mid+ mpw);
-        //dto가 아닌 개별적으로 받아옴
-        return memberService.login(mid, mpw);
-
-    }
-
+    //시큐리티 사용 시 필요 없음
 
     //4.로그아웃 처리 매핑
-    @GetMapping("/logout")
-    public String logout(){
-        memberService.logout();
-//        return "main"; //타임리프 반환
-        return "redirect:/"; //URL 이동
-    }
+//    @GetMapping("/logout")
+//    public String logout(){
+//        memberService.logout();
+////        return "main"; //타임리프 반환
+//        return "redirect:/"; //URL 이동
+//    }
 
 
 

@@ -26,6 +26,9 @@ function save(){
 }
 
 
+
+
+///////////////////////////////////////////////////////////////
 // 2. 다음 주소 -> 좌표
     var mapContainer = document.getElementById('map'), // 지도를 표시할 div
 

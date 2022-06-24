@@ -2,11 +2,13 @@ package ezenweb.domain.Board;
 
 import ezenweb.domain.BaseTime;
 import ezenweb.domain.member.MemberEntity;
+import ezenweb.domain.member.Role;
 import lombok.*;
 
 import javax.persistence.*;
 
-@Getter  @Setter @ToString
+@Getter  @Setter
+@ToString( exclude = { "memberEntity" , "categoryEntity" } ) // [ 객체주소값 대신 데이터로 출력해주는 메소드 ]
 @NoArgsConstructor @AllArgsConstructor
 @Builder @Entity //테이블과매칭
 @Table(name="board")

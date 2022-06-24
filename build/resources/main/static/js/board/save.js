@@ -20,5 +20,5 @@ function board_save(){
                 alert("작성 권한이 없습니다.");
             }
         }
-    })
+    });
 }

@@ -5,7 +5,7 @@ function board_get(){
     $.ajax({
         url : '/board/getboard',
         success : function(board){
-        console.log(board);
+//        console.log(board);
             let html =
                 '<div>게시물 번호:'+board.bno+'</div>'+
                 '<div>게시물 제목:'+board.btitle+'</div>'+
