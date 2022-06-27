@@ -44,8 +44,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf() // csrf : 사이트간 요청 위조 [ 해킹 공격 방법 중 하나 ] = 서버에게 요청할 수 있는 페이지 제한
             .ignoringAntMatchers("/member/logincontroller") //로그인 풀어주기(무시)
             .ignoringAntMatchers("/member/signup")
+            .ignoringAntMatchers("/board/save") //글쓰기 열어주기
                 .and().exceptionHandling() //오류 페이지 발생시 시큐리티가 가지고 옴
-                .accessDeniedPage("/error");
+                .accessDeniedPage("/error")
+            .and()
+                .oauth2Login() //oauth2 위치
+                .userInfoEndpoint() //유저 정보가 들어오는 위치
+                .userService(memberService); //해당 서비스 클래스로 유저 정보를 받음
 
 
 //        super.configure(http); //슈퍼클래스의 기본 설정값으로 사용하는 것

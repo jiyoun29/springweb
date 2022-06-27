@@ -22,7 +22,9 @@ public class MemberEntity extends BaseTime {
     private int mno;
     private String mid;
     private String mpw;
+    private String memail;
     private String mname;
+    private String oauth; //일반회원과 구분용
 
     //Enum 타입 설정
     @Enumerated(EnumType.STRING) //타입을 string으로 줌

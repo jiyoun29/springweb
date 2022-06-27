@@ -1,8 +1,6 @@
 package ezenweb.Service;
 
 import ezenweb.Dto.BoardDto;
-import ezenweb.Dto.LoginDto;
-import ezenweb.Dto.MemberDto;
 import ezenweb.domain.Board.BoardEntity;
 import ezenweb.domain.Board.BoardRepository;
 import ezenweb.domain.Board.CategoryEntity;
@@ -16,12 +14,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -47,12 +50,35 @@ public class BoardService {
     //1. C [인수 : dto] why? 게시물 dto를 받아야함
     @Transactional
     public boolean save(BoardDto boardDto){
-        //1. 세션 호출 (로그인 형변환)
-        LoginDto loginDto= (LoginDto) request.getSession().getAttribute("login");
+        //1. 세션 호출 (로그인 형변환) [시큐리티 사용시 -> 세션 x-> 인증세션('userdetails vs defaultOAuth2User)]
+//        LoginDto loginDto= (LoginDto) request.getSession().getAttribute("login");
 
-        if(loginDto != null){ //로그인이 되어 있으면
+        //1. 인증된 세션 호출[시큐리티 내 인증 결과 호출]
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //2. 인증 정보 가져오기
+        Object principal = authentication.getPrincipal(); //Principal : 인증 정보
+        //3. 일반 회원 : userdetails, oauth회원 : defaultOAuth2User 구분
+            // java문법 : 자식 객체 instanceof 부모클래스명 : 상속 확인 키워드
+        String mid = null;
+        if(principal instanceof UserDetails){ //인증 정보의 타입이 userdetail이면 [일반 회원 검증]
+            mid = ((UserDetails) principal).getUsername(); //인증정보에서 mid 호출
+        } else if (principal instanceof DefaultOAuth2User){ //인증 정보의 타입이 DefaultOauth2user이면 oauth2회원 검증
+            Map<String, Object> map = ((DefaultOAuth2User) principal).getAttributes();
+            //회원정보 요청키를 이용한 구분 짓기
+            if(map.get("response") != null){ //1. 네이버일 경우 [Attributes에 response 이라는 키가 존재하면]
+                Map<String, Object> map2 = (Map<String, Object>) map.get("response");
+                mid = map2.get("email").toString().split("@")[0];
+            } else { //2. 카카오인 경우
+                Map<String, Object> map2 = (Map<String, Object>) map.get("kakao_account");
+                mid = map2.get("email").toString().split("@")[0];
+            }
+
+        } else {return  false;} //인증 정보가 없을 경우
+
+
+        if(mid != null){ //로그인이 되어 있으면
             //2.로그인 된 회원의 엔티티 찾기
-            Optional<MemberEntity> optionalMember = memberRepository.findById(loginDto.getMno());
+            Optional<MemberEntity> optionalMember = memberRepository.findBymid(mid);
                 //findById(pk키) -> 반환타입 : Optional클래스 [null포인터를 가지고 null값을 가진다(저장).]
                 if(optionalMember.isPresent()){
                     //null 검사 : optional 클래스 내 메소드 : isPresent() : null이 아니면

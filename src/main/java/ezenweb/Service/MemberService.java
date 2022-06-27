@@ -2,6 +2,7 @@ package ezenweb.Service;
 
 import ezenweb.Dto.LoginDto;
 import ezenweb.Dto.MemberDto;
+import ezenweb.Dto.OauthDTO;
 import ezenweb.domain.member.MemberEntity;
 import ezenweb.domain.member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,23 +11,81 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class MemberService implements UserDetailsService {
-                        //UserDetailsService 인터페이스 [ 추상 메소드 존재 ]
+public class MemberService implements UserDetailsService, OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+                        /*UserDetailsService 인터페이스 [ 추상 메소드 존재 ]
+                            -> loadUserByUsername
+                        OAuth2UserService<OAuth2UserRequest, OAuth2User> : Oauth2 회원
+                            -> loadUser 구현 */
+
+
+    /* oauth2 서비스 제공 메소드
+    OAuth2UserRequest : 인증 결과 호출 클래스
+    */
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+
+        //인증[로그인 성공(인증)된 결과 정보 요청]
+        OAuth2UserService oAuth2UserService = new DefaultOAuth2UserService();
+        OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest); //결과값을 가지고 있는 코드
+
+//        System.out.println(oAuth2User.toString());
+
+        //클라이언트 아이디값 [ 네이버 vs 카카오 vs 구글 ] oauth ; 구분용으로 사용할 변수
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+
+        //회원정보 요청시 사용되는 json 키 값 호출
+        String userNameAttributeName = userRequest
+                        .getClientRegistration()
+                        .getProviderDetails()
+                        .getUserInfoEndpoint()
+                        .getUserNameAttributeName();
+
+        System.out.println("클라이언트(개발자)가 등록한 이름 : "+registrationId);
+        System.out.println("회원정보(json) 호출 시 사용되는 키 이름 : "+ userNameAttributeName);
+        System.out.println("회원정보(로그인) 결과 내용 : "+oAuth2User.getAttributes());
+
+
+        //oauth2 정보 -> Dto -> entity -> db저장
+        OauthDTO oauthDTO = OauthDTO.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
+
+        //1. 이메일로 엔티티 호출
+        Optional<MemberEntity> optional = memberRepository.findBymemail(oauthDTO.getMemail());
+        //2. 만약에 엔티티가 없으면
+        if(!optional.isPresent()){
+            memberRepository.save(oauthDTO.toentity()); //dto->entity 저장
+        }
+
+
+        //반환타입 DefaultOAuth2User(권한(role) ,회원인증정보, 회원정보 호출키)
+            //DefaultOAuth2User, UserDetail : 반환시 인증 세션 자동부여[SimpleGrantedAuthority(필수)]
+       return new DefaultOAuth2User(
+               Collections.singleton(new SimpleGrantedAuthority("ROLE_MEMBER")), //빨간느낌표 클릳ㄱ 후 자동생성
+               oAuth2User.getAttributes(),
+               userNameAttributeName
+       );
+    }
 
     /*
-    1. 로그인 서비스 제공 메소드
-    2. 패스워드 검증x [ 시큐리티 제공 ]
-    3. 아이디만 검증 처리
-    **/
+        1. 로그인 서비스 제공 메소드
+        2. 패스워드 검증x [ 시큐리티 제공 ]
+        3. 아이디만 검증 처리
+        **/
     @Override
     public UserDetails loadUserByUsername(String mid) throws UsernameNotFoundException {
         
