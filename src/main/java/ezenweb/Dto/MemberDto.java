@@ -18,6 +18,9 @@ public class MemberDto {
     private String mpw;
     private String mname;
 
+    private String memail;
+
+
     //DTO -> ENTITY
     //dto는 안정성 이유로 사용
     public MemberEntity toentitiy(){
@@ -32,6 +35,7 @@ public class MemberDto {
                 .mid( this.mid)
                 .mpw(passwordEncoder.encode(this.mpw))
                 .mname(this.mname)
+                .memail(this.memail)
                 .roomEntityList( new ArrayList<>() )
                 .role(Role.MEMBER) //권한 부여
                 .build();

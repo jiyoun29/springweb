@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <link href="/css/signup.css" rel="stylesheet">
+    <!--부트스트랩-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body>
+<div th:replace="header.html :: header"></div> <!--헤더 불러오기 (th빨간색->alt enter)-->
+
+    <h6>아이디 찾기</h6>
+    <form>
+        이름 <input type="text" id="idmname">
+        이메일 <input type="text" id="idmemail">
+        <button type="button" onclick="idfind()">아이디 찾기</button>
+    </form>
+
+    <h6>비밀번호 찾기</h6>
+    <form>
+        아이디 <input type="text" id="pwmid">
+        이메일 <input type="text" id="pwmemail">
+        <button type="button" onclick="pwfind()">비밀번호 찾기</button>
+    </form>
+
+
+<!--부트스트랩-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<!-- 최신 제이쿼리-->
+<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="/js/member/find.js"></script>
+</body>
+</html>

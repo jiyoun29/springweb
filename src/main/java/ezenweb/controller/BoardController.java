@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@Controller
+@Controller //템플릿 영역 -> 반환은 템플릿만 가능
 @RequestMapping("/board")
 public class BoardController  {
 

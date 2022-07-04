@@ -6,11 +6,13 @@ import ezenweb.Dto.OauthDTO;
 import ezenweb.domain.member.MemberEntity;
 import ezenweb.domain.member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -18,13 +20,13 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.mail.javamail.JavaMailSender;    // 자바 메일 전송 인터페이스
 
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 
 @Service
 public class MemberService implements UserDetailsService, OAuth2UserService<OAuth2UserRequest, OAuth2User> {
@@ -169,13 +171,41 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
             //3. @Autowired
             //  클래스명 객체명;
             //이런 모양이 된다.
-    
-    
+
+
+    @Autowired
+    private JavaMailSender javaMailSender; //java 메일 전송 인터페이스
+
+    //3. 메일전송 메소드
+    public void mailsend(String toemail, String title, StringBuilder content){
+                    //인수 : 받는사람이메일,제목,내용
+        //SMTP : 간이 메일 전송 프로토콜 [텍스트 외 불가능]
+        try { //이메일 전송
+            MimeMessage message = javaMailSender.createMimeMessage(); //빨간줄 체크 삭제
+                //Mime 프로토콜 : 텍스트 외 내용을 담는 프로토클 / SMTP와 같이 많이 사용됨
+            //0.mime 설정
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, true, "UTF-8"); //예외처리
+            //1. 보내는 사람
+            mimeMessageHelper.setFrom("0u0_29@naver.com","Ezen 부동산");
+            //2. 받는 사람
+            mimeMessageHelper.setTo( toemail );
+            //3. 메일 제목
+            mimeMessageHelper.setSubject(title);
+            //4. 메일 내용
+            mimeMessageHelper.setText(content.toString(),true);
+            //5. 메일 전송
+            javaMailSender.send(message);
+        } catch (Exception e) {System.out.println("메일전송실패"+e);}
+
+    }
+
 
     //2. 회원가입처리 메소드
+    @Transactional //세팃값 업데이트를 위해서 필수
     public boolean signup(MemberDto memberDto){
         //dto -> entity [ 이유 : Dto는 DB로 들어갈 수 없다 ]
         MemberEntity memberEntity = memberDto.toentitiy();
+        System.out.println("가져오기"+memberDto.getMemail());
             //dto에 builder 만들었으므로 dto에서 호출한다.
 
         //entity 저장
@@ -183,9 +213,45 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
 
         //저장여부 판단
         if(memberEntity.getMno() < 1){ //getmno를 위해 entity에 getter을 추가한다.
-            return false;
-        } else { return true; }
+            return false; //회원가입 실패
+        } else { //이메일에 들어가는 내용 [ html ]
+            StringBuilder html = new StringBuilder(); //StringBuilder : 문자열 연결 클래스 [ append 연결메소드 vs +:연결연산자 ]
+            html.append("<html><body><h1> EZEN 부동산 회원 이메일 검증 </h1>");
+                //인증코드[문자 난수]만들기
+            Random random = new Random(); //랜덤 객체
+                StringBuilder authkey = new StringBuilder();
+            for(int i = 0; i < 12 ; i++){ //12자리 문자열 난수 생성
+                char randomchar = (char)(random.nextInt(26)+97); //97~122 //소문자 a->z난수 중 1개 발생
+                authkey.append(randomchar); //생성된 문자 난수들을 하나씩 연결 -> 문자열 만들기
+            } //인증코드 전달
+            System.out.println("인증코드"+authkey);
+            html.append("<a href='http://localhost:8081/member/email/"+authkey+"/"+memberDto.getMid()+"'>이메일 검증</a>");
+            html.append("</body></html>");
 
+            //해당 엔티티의 인증키 저장
+                memberEntity.setOauth(authkey.toString());
+
+            //회원가입 인증 메일 보내기
+            mailsend(memberDto.getMemail(), "EZEN 부동산 회원가입 메일 인증", html );
+
+            return true; //회원가입 성공
+        }
+    }
+
+    @Transactional
+    public boolean authsuccess(String authkey, String mid){
+//        System.out.println("검증번호 : "+authkey+"회원아이디"+mid);
+        //db 업데이트
+        Optional<MemberEntity> optional = memberRepository.findBymid(mid);
+
+        if(optional.isPresent()){ //optional이 null 아니면
+            MemberEntity memberEntity = optional.get(); //해당 엔티티 가져오기
+            if (authkey.equals(memberEntity.getOauth())) { //만약에 인증 키와 db내 인증키와 동일하면
+                memberEntity.setOauth("Local"); //로칼로 보낸다.
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -226,17 +292,52 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
 
 
 
+    //6. 아이디 찾기 [이름과 이메일이 동일한 경우 프론트엔드에 표시]
+    public String idfind(String mname, String memail){
+        String idfind = null;
+        //로직
+        Optional<MemberEntity> optional = memberRepository.findId(mname, memail);
+
+        if(optional.isPresent()){
+            idfind = optional.get().getMid();
+        }
+        return idfind;
+    }
+    //구조??
 
 
 
-
-
-
-
-
-
-
-
-
+    //7. 패스워드 찾기 [아이디 이메일이 동일한 경우 이메일로 임시(난수) 전송]
+    @Transactional
+    public boolean pwfind(String mid, String memail){
+        Optional<MemberEntity> optional = memberRepository.findPw(mid, memail);
+        if(optional.isPresent()){ //해당 엔티티를 찾았으면
+            //1. 임시 비밀번호의 난수를 냉성한다.
+            String tempw = "";
+            for(int i = 0; i<12; i++) {//12자리
+                Random random = new Random();
+                char rchar = (char) (random.nextInt(58) + 65);
+                tempw += rchar;
+//                tempw = tempw + rchar;
+            }
+            System.out.println("임시 비밀번호 :"+tempw);
+            //2. 현재 비밀번호를 임시비밀번호로 변경한다.
+                //비크립트 방식의 암호화
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            optional.get().setMpw(passwordEncoder.encode(tempw)); //임시 비밀번호도 암호화가 필요하다.
+            //3. 변경된 비밀번호를 이메일로 전송한다.
+                //메일 내용 구현
+            StringBuilder html = new StringBuilder();
+                html.append("<html><body>"); //html 시작
+                html.append("<div>회원님의 임시 비밀번호가 발급 되었습니다.</div>");
+                html.append("<div>"+tempw+"</div>");
+                html.append("</body></html>"); //html 끝
+            //메일 전송 메소드 호출
+            mailsend(optional.get().getMemail(), "EZEN 부동산 회원 임시 비밀번호", html);
+            return true;
+        }
+        //해당 엔티티를 못 찾았으면
+        return false;
+    }
 
 }

@@ -1,6 +1,8 @@
 package ezenweb.domain.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -12,6 +14,14 @@ public interface MemberRepository extends JpaRepository<MemberEntity , Integer> 
 
     //2. 이메일을 이용한 엔티팅 검색
     Optional<MemberEntity> findBymemail(String email);
+
+    //3. 이름과 이메일이 동일한 엔티티 검색
+//1번 방법    @Query(value = "select * from member where mname = ?1 and memail = ?2", nativeQuery = true) //네이티브쿼리
+    @Query(value = "select * from member where mname = :mname and memail = :memail", nativeQuery = true) //네이티브쿼리
+    Optional<MemberEntity> findId(@Param("mname") String mname, @Param("memail") String memail);
+
+    @Query(value = "select * from member where mid = :mid and memail = :memail", nativeQuery = true)
+    Optional<MemberEntity> findPw(@Param("mid") String mid, @Param("memail") String memail);
 
 }
 /*

@@ -15,6 +15,7 @@ function signup(){
         contentType : false,
         processData : false,
         success : function(re){ alert(re);
+            console.log(formdata);
             if(re == 1){ alert("회원가입 성공")
                 location.href = "/member/login";
             } else { alert("회원가입 실패 [서비스 오류]") }

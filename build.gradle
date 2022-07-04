@@ -44,6 +44,9 @@ dependencies {
     //oauth2 라이브러리[ 소셜 sns 로그인 ]
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+    //스타터 메일
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 
 }
 

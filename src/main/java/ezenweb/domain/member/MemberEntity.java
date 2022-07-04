@@ -30,6 +30,7 @@ public class MemberEntity extends BaseTime {
     @Enumerated(EnumType.STRING) //타입을 string으로 줌
     private Role role;    //롤 권한 부여
         //권한(Role) 중에 key 값만 반환 메소드 선언
+
     public String getrolekey(){ //시큐리티에서 인증허가 된 리스트에 보관하기 위해서
         return role.getKey(); //키 값만 반환
     }

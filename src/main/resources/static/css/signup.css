@@ -1,0 +1,40 @@
+@font-face {
+    font-family: 'PyeongChangPeace-Light';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/PyeongChangPeace-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+}
+
+*{ font-family:'PyeongChangPeace-Light';
+}
+
+body{
+    background-image: url('/img/home (2).jpg'); /* 배경 이미지*/
+    }
+
+.signupbox{
+    background-color: white;
+    margin-top: 15%;
+    border-radius : 15px;
+    box-shadow : 5px 5px 5px 5px gray;
+    opacity: 0.9;
+}
+.signupbtn{
+    background-color: #042940 !important; /*부트스트랩 충돌시 우선 설정 */
+    color:white !important;
+}
+.naverbtn{
+    background-color: green !important; /*부트스트랩 충돌시 우선 설정 */
+    color:white !important;
+    text-size : 10px !important;
+}
+
+.kakaobtn{
+    background-color: yellow !important; /*부트스트랩 충돌시 우선 설정 */
+    color:black !important;
+    text-size : 10px !important;
+}
+
+.btn{
+    border: 1px solid gray; !important;
+}
