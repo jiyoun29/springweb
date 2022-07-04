@@ -20,6 +20,17 @@ public class MemberController {
         return "member/find";
     }
 
+    //이메일 인증 여부 확인
+    @GetMapping("authmailcheck")
+    @ResponseBody
+    public int authmailcheck(@RequestParam("mid") String mid){
+        int result = memberService.authmailcheck(mid);
+        return result;
+    }
+
+
+
+
     //아이디 찾기 oauth2는 회원제공x
     @GetMapping("/idfind")
     @ResponseBody

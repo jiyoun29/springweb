@@ -340,4 +340,30 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
         return false;
     }
 
+
+    //이메일 인증 여부 확인
+    public int authmailcheck(String mid){
+        Optional<MemberEntity> optional = memberRepository.findBymid(mid);
+        if(optional.isPresent()){   //해당 엔티티 찾아
+            if(optional.get().getOauth().equals("Local")){ //이메일 인증이 된 회원이면
+                return 1; //일반회원
+            } else if(optional.get().getOauth().equals("kakao")){
+                return 2; //카카오 회원이면
+            } else if(optional.get().getOauth().equals("naver")){
+                return 3; //네이버 회원이면
+            }
+        }
+        return 0; //실패
+    }
+
+
+
+
+
+
+
+
+
+
+
 }
