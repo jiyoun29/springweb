@@ -16,7 +16,6 @@ function getisread(){
 
 
 getweather();
-
 // 날씨 크롤링 메소드
 function getweather(){
     $.ajax({
@@ -57,15 +56,12 @@ $(document).ready( function(){
     // 3. 각 메소드 구현  [ open close onMessage ]
     function onOpen2(){   } //alert("들어왔다.");
     function onClose2(){  } //alert("나갔다.");
-    function onMessage2(){  } //alert("메시지왔다.");
+    function onMessage2(){ alert("메시지왔다."); getisread(); } //alert("메시지왔다.");
     function send( jsonmsg ){
         // json형식의 문자열 전송
         msgwebsocket.send(  JSON.stringify(jsonmsg) );
     }
-
 });
-
-
 
 
 

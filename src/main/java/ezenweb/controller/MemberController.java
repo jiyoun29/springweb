@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+
 @Controller //controller와 view의 통신역할. 템플릿 영역
 @RequestMapping("/member") //이 컨트롤러로 들어오려면 member로 들어와라
 public class MemberController {
@@ -168,13 +171,47 @@ public class MemberController {
 
 
     //////////////쪽지
-    @GetMapping("/getisread")
+    @GetMapping("/getisread") //1. 안읽은메시지 처리 컨트롤
     @ResponseBody
-    public Integer getisread(){
-        return memberService.getisread();
+    public Integer getisread(){return memberService.getisread();}
+
+
+    @GetMapping("/message") ///2. 메시지 html 열기 컨트롤
+    public String message(){
+        return "member/message";
+    }
+    
+    @GetMapping("/getfrommsglist") //3. 보낸 메시지 리스트 출력 처리 컨트롤 
+    public void getfrommsglist(HttpServletResponse response){
+        try{
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().print(memberService.getfrommsglist());
+        } catch (Exception e){System.out.println(e);}
+    }
+
+    @GetMapping("/gettomsglist") //3. 받은 메시지 리스트 출력 처리 컨트롤 
+    public void gettomsglist(HttpServletResponse response){
+        try{
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().print(memberService.gettomsglist());
+        } catch (Exception e){System.out.println(e);}
+
     }
 
 
+    @PutMapping("/isread")//4. 읽음 처리 수정 컨트롤
+    @ResponseBody //반환타입이 있을 경우 반드시 추가
+    public boolean isread(@RequestParam("msgno") int msgno ){
+        return memberService.isread(msgno);
+    }
+
+    @DeleteMapping("/msgdelete") //5.선택된 메세지 삭제 처리
+    @ResponseBody
+    public boolean msgdelete(@RequestBody List<Integer> deletelist){
+        return memberService.msgdelete(deletelist);
+    }
 
 
 

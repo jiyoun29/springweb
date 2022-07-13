@@ -7,6 +7,7 @@ import ezenweb.domain.member.MemberEntity;
 import ezenweb.domain.member.MemberRepository;
 import ezenweb.domain.message.MessageEntity;
 import ezenweb.domain.message.MessageRepository;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -431,14 +432,69 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
         return count;
     }
 
-    // ------------------------------------------------------------------------
+    //1. 본인이 보낸 메시지 리스트
+    public JSONArray getfrommsglist(){ //2.본인(로그인)이 보낸 메시지 리스트
+        String mid = getloginmid();
+        if(mid == null) return null;
+
+        List<MessageEntity> list =
+        memberRepository.findBymid(mid).get().getFromentitylist();
+
+        //json형 변환[js에서 사용하기 위해]
+        JSONArray jsonArray = new JSONArray();
+        for(MessageEntity msg : list){
+            JSONObject object = new JSONObject();
+            object.put("msgno", msg.getMsgno());
+            object.put("msg", msg.getMsg());
+            object.put("to", msg.getToentity().getMid());
+            object.put("date", msg.getCreatedate());
+            object.put("isread", msg.isIsread()); //읽음 여부
+            jsonArray.put(object);
+        }
+        return jsonArray;
+    }
 
 
+    //2. 본인이 받은 메시지
+    public JSONArray gettomsglist(){ //2.본인(로그인)이 받은 메시지 리스트
+        String mid = getloginmid();
+        if(mid == null) return null;
 
+        List<MessageEntity> list =
+                memberRepository.findBymid(mid).get().getFromentitylist();
 
+        //json형 변환[js에서 사용하기 위해]
+        JSONArray jsonArray = new JSONArray();
+        for(MessageEntity msg : list){
+            JSONObject object = new JSONObject();
+            object.put("msgno", msg.getMsgno());
+            object.put("msg", msg.getMsg());
+            object.put("from", msg.getToentity().getMid());
+            object.put("date", msg.getCreatedate());
+            object.put("isread", msg.isIsread()); //읽음 여부
+            jsonArray.put(object);
+        }
+        return jsonArray;
+    }
+    //읽음 처리 메소드[수정] 해당 메시지번호 엔티티의 읽음여부 수정
+    @Transactional
+    public boolean isread( int msgno ){
+        //해당 메시지 번호 엔티티의 읽음 여부 수정
+        memberRepository.findById(msgno).get().setIsread(true);
+        return true;
+    }
 
+    //선택된 메세지 삭제
+    @Transactional
+    public boolean msgdelete(List<Integer> deletelist){
 
-
+        //1. 반복문 이용한 모든 엔티티 호출
+        for(int msgno : deletelist){
+            MessageEntity entity = memberRepository.findBymid(msgno).get();
+            messageRepository.delete(entity);
+        }
+        return true;
+    }
 
 
 

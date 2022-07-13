@@ -24,17 +24,21 @@
     <li class="nav-item"> <a class="nav-link text-dark" href="/room/list"> 방 찾기 </a>  </li>
     <li class="nav-item"> <a class="nav-link text-dark" href="/board/list"> 커뮤니티 </a> </li>
 
-    <span id="loginmidbox" sec:authentication="name"></span>
+
+    <!--인증된 회원 아이디 출력-->
+    <li class="nav-item" sec:authorize="isAnonymous()">
+      <a class="nav-link text-dark"><span id="loginmidbox" sec:authentication="name"></span> </a>
+    </li>
 
     <!--부트스트랩 배치-->
-    <button type="button" class="btn btn-primary position-relative">
-      쪽지
-      <span id="msgisreadbox" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-      0+
-      <span class="visually-hidden">unread messages</span>
-      </span>
-    </button>
-
+  <li class="nav-item" sec:authorize="isAnonymous()">
+      <a href="/member/message" type="button" class="nav-link text-dark position-relative">
+        쪽지
+        <span id="msgisreadbox" class="position-absolute top-5 start-80 translate-middle badge rounded-pill bg-warning text-dark">
+        0+
+        </span>
+      </a>
+  </li>
 
 
 
