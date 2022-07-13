@@ -167,4 +167,17 @@ public class MemberController {
 
 
 
+    //////////////쪽지
+    @GetMapping("/getisread")
+    @ResponseBody
+    public Integer getisread(){
+        return memberService.getisread();
+    }
+
+
+
+
+
+
+
 }

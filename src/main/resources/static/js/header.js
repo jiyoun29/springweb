@@ -1,4 +1,20 @@
 
+getisread();
+
+
+//안 읽은 쪽지 개수 호출 메소드
+function getisread(){
+    $.ajax({
+        url : '/member/getisread',
+        success : function(object){
+            $("#msgisreadbox".html(object+"+"))
+        }
+    });
+}
+
+
+
+
 getweather();
 
 // 날씨 크롤링 메소드
@@ -39,9 +55,9 @@ $(document).ready( function(){
     msgwebsocket.onclose = onClose2;
     msgwebsocket.onmessage = onMessage2;
     // 3. 각 메소드 구현  [ open close onMessage ]
-    function onOpen2(){ alert("들어왔다.");  }
-    function onClose2(){ alert("나갔다."); }
-    function onMessage2(){ alert("메시지왔다."); }
+    function onOpen2(){   } //alert("들어왔다.");
+    function onClose2(){  } //alert("나갔다.");
+    function onMessage2(){  } //alert("메시지왔다.");
     function send( jsonmsg ){
         // json형식의 문자열 전송
         msgwebsocket.send(  JSON.stringify(jsonmsg) );
@@ -68,7 +84,7 @@ $(document).ready( function(){
     // 2. JS에서 제공하는 websocket 클래스로 websocket 객체 선언
         // 1. [ /ws/chat ] 해당 ( spring :  webSocketHandler path )URL 로 소켓 연결
         // 2. 현재 js가 새로고침[F5] 되면 소켓도 초기화
-    let websocket = new WebSocket("ws://localhost:8081/ws/chat");
+    let websocket = new WebSocket("ws://localhost:8081/ws/chat"); //주소 확인 필요
     websocket.onmessage = onMessage;    // 아래에서 구현한 메소드를 웹소켓 객체에 대입
     websocket.onopen = onOpen;              // 아래에서 구현한 메소드를 웹소켓 객체에 대입
     websocket.onclose = onClose;            // 아래에서 구현한 메소드를 웹소켓 객체에 대입

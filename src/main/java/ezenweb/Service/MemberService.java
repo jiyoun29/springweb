@@ -411,7 +411,25 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
         toentity.getToentitylist().add( messageEntity );        //  받는사람 엔티티의 받은메시지 리스트에 메시지 저장
         return  true;
     }
+
+
     // 2. 안읽은 메시지 개수 메소드
+    public Integer getisread(){
+        //1. 로그인(인증)된 회원의 아이디
+        String mid = getloginmid(); //위에 만들어놓은 것
+        if(mid == null ){return -1;} //카운트가 최소0인데 -1이라는 것은 로그인이 안 됐다는 뜻
+
+        int count = 0;
+
+//        for(MessageEntity message : memberRepository.findBymid(mid).get().getToentitylist()){
+//            if(! message.isIsread()) {count ++;} //만약에 isread() false이면 안 읽은 메세지 개수 증가
+//        }
+
+        int mno = memberRepository.findBymid(mid).get().getMno(); //반환타입 int
+        count = messageRepository.getisread(mno);
+
+        return count;
+    }
 
     // ------------------------------------------------------------------------
 
