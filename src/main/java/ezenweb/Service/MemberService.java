@@ -5,10 +5,15 @@ import ezenweb.Dto.MemberDto;
 import ezenweb.Dto.OauthDTO;
 import ezenweb.domain.member.MemberEntity;
 import ezenweb.domain.member.MemberRepository;
+import ezenweb.domain.message.MessageEntity;
+import ezenweb.domain.message.MessageRepository;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,6 +39,22 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
                             -> loadUserByUsername
                         OAuth2UserService<OAuth2UserRequest, OAuth2User> : Oauth2 회원
                             -> loadUser 구현 */
+
+    // 로그인(인증)된 회원의 아이디 찾기 메소드
+    public String getloginmid(){
+        // 1. 인증 객체 호출
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        // 2. 인정 정보 객체 호출
+        Object principal = authentication.getPrincipal();
+
+        if( principal.equals("anonymousUser") ){ // 로그인X
+            return null;
+        }else{ // 로그인O
+            LoginDto loginDto = (LoginDto) principal;
+            return loginDto.getMid();
+        }
+    }
 
 
     /* oauth2 서비스 제공 메소드
@@ -355,6 +376,44 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
         }
         return 0; //실패
     }
+
+
+
+
+    //----------- 메시지 ---------------------------------------------------
+    // 1. 메시지 전송 메소드
+    @Autowired
+    private MessageRepository messageRepository;
+    @Transactional
+    public boolean messagesend(JSONObject object){
+        // 1. JSON 정보 호출
+        String from = (String) object.get("from");
+        String to = (String) object.get("to");
+        String msg = (String) object.get("msg");
+        // 2. 각 회원들의 엔티티 찾기
+        // 1. 보낸사람의 엔티티
+        MemberEntity fromentity = null;
+        Optional<MemberEntity> optionalMemberEntity1 = memberRepository.findBymid( from );
+        if( optionalMemberEntity1.isPresent() ){ fromentity = optionalMemberEntity1.get(); }
+        else{ return false; }
+        // 2. 받는사람의 엔티티
+        MemberEntity toentity = null;
+        Optional<MemberEntity> optionalMemberEntity2 = memberRepository.findBymid(to);
+        if( optionalMemberEntity2.isPresent() ){ toentity = optionalMemberEntity2.get(); }
+        else{ return false; }
+        // 3. 메시지 엔티티 생성
+        MessageEntity messageEntity
+                = MessageEntity.builder().msg(msg).fromentity(fromentity).toentity(toentity).build();
+        // 4. 메시지 세이브
+        messageRepository.save( messageEntity );
+        // 각 회원에 메시지 fk 주입 [ 수정 ]
+        fromentity.getFromentitylist().add( messageEntity ); // 보낸사람 엔티티의 보낸메시지 리스트에 메시지 저장
+        toentity.getToentitylist().add( messageEntity );        //  받는사람 엔티티의 받은메시지 리스트에 메시지 저장
+        return  true;
+    }
+    // 2. 안읽은 메시지 개수 메소드
+
+    // ------------------------------------------------------------------------
 
 
 

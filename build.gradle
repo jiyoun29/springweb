@@ -47,6 +47,9 @@ dependencies {
     //스타터 메일
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    implementation 'org.jsoup:jsoup:1.15.2' // jsoup : HTML 파싱 라이브러리( 크롤링 )
+    implementation 'org.springframework.boot:spring-boot-starter-websocket' // 웹소켓
+
 
 }
 

@@ -34,16 +34,26 @@ public class RoomService {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private  MemberService memberService;
+
 
 
 
     //room 저장
-    @Transactional
+    @Transactional //트랙잭션
     public boolean room_save(RoomDto roomDto){
-        //현재 로그인 된 세션 호출
-        LoginDto loginDto = (LoginDto) request.getSession().getAttribute("login");
+
+        String mid = memberService.getloginmid();
+
+//        //현재 로그인 된 세션 호출
+//        LoginDto loginDto = (LoginDto) request.getSession().getAttribute("login");
+//        MemberEntity memberEntity = memberRepository.findById(loginDto.getMno()).get();
         // 현재 로그인 회원의 엔티티 찾기
-        MemberEntity memberEntity = memberRepository.findById(loginDto.getMno()).get();
+        Optional<MemberEntity> optionalMemberEntity = memberRepository.findBymid(mid);
+        MemberEntity memberEntity = null;
+        if(optionalMemberEntity.isPresent()){memberEntity = optionalMemberEntity.get();}
+        else{return false;}
 
 
         //dto -> entity 변환
@@ -238,6 +248,7 @@ public class RoomService {
 
             //1. json에 엔티티 필드값 넣기
         object.put("rtitle" , roomEntity.getRtitle());
+        object.put("mid", roomEntity.getMemberEntity().getMid());
 
         JSONArray jsonArray = new JSONArray();
             //2. 룸엔티티에 저장된 룸 이미지를 반복문을 이용한 룸이미지를 jsonarray에 저장

@@ -24,8 +24,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeHttpRequests() //인증된 요청들
                 .antMatchers("/admin/**").hasRole("ADMIN") //어드민 뒤로부터는 어드민만 들어갈 수 있게 롤을 부여
                 .antMatchers("/MEMBER/INFO").hasRole("MEMBER")
-            .antMatchers("/board/save") // 인증할 url (글쓰기 페이지를 로그인한 사람에게만 주기)
-                .hasRole("MEMBER") // 해당 인증 권한이 있을 경우 = 세션에 role 필드가 있어야 한다.
+            .antMatchers("/board/save").hasRole("MEMBER") // 인증할 url (글쓰기 페이지를 로그인한 사람에게만 주기)
+            .antMatchers("/room/write").hasRole("MEMBER") // 해당 인증 권한이 있을 경우 = 세션에 role 필드가 있어야 한다.
             .antMatchers("/**") //인증할 url
             .permitAll() //인증이 없어도 요청 가능한 상태 = 모든 접근 허용
             .and()
@@ -35,6 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/") //로그인 성공시, 이동할 url
                 .usernameParameter("mid") //로그인시 아이디로 입력 받을 변수명[기본값 : user->mid]
                 .passwordParameter("mpw")//로그인시 비밀번호로 입력 받을 변수명[기본값 : password->mpw]
+                .failureUrl("/member/login/error")
             .and()
                 .logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/member/logout")) //로그인 처리할 url 정의
@@ -45,6 +46,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .ignoringAntMatchers("/member/logincontroller") //로그인 풀어주기(무시)
             .ignoringAntMatchers("/member/signup")
             .ignoringAntMatchers("/board/save") //글쓰기 열어주기
+            .ignoringAntMatchers("/room/write") // 방등록
+            .ignoringAntMatchers("/room/roomlist") // 지도에 표시할 데이터 요청/응답
+
                 .and().exceptionHandling() //오류 페이지 발생시 시큐리티가 가지고 옴
                 .accessDeniedPage("/error")
             .and()

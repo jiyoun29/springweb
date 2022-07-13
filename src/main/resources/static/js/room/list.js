@@ -2,12 +2,12 @@
 //마커클러스터 지도사용
 
 
-//0. 현재 내 위치 위도 경도 구하기
-    navigator.geolocation.getCurrentPosition(function(position) {
-        var lat = position.coords.latitude, // 위도
-            lon = position.coords.longitude; // 경도
-    //전부 감싸기 (지금 잠깐 닫음 열려면 맨 아래에 } 넣기)
-//배포에서는 0번 삭제, 1번의 lat lon에 좌표 임시로 넣기
+////0. 현재 내 위치 위도 경도 구하기
+//    navigator.geolocation.getCurrentPosition(function(position) {
+//        var lat = position.coords.latitude, // 위도
+//            lon = position.coords.longitude; // 경도
+//    //전부 감싸기 (지금 잠깐 닫음 열려면 맨 아래에 } 넣기)
+////배포에서는 0번 삭제, 1번의 lat lon에 좌표 임시로 넣기
 
 
 //1.log map 변수
@@ -18,7 +18,7 @@
 
 
 
-//2. 클러스터 [마커 짖ㅂ합] 변수
+//2. 클러스터 [마커 집합] 변수
     // 마커 클러스터러를 생성합니다
     // 마커 클러스터러를 생성할 때 disableClickZoom 값을 true로 지정하지 않은 경우
     // 클러스터 마커를 클릭했을 때 클러스터 객체가 포함하는 마커들이 모두 잘 보이도록 지도의 레벨과 영역을 변경합니다
@@ -81,16 +81,13 @@
         success : function( data ){
                 console.log(data); // 통신 확인
             //만약에 데이터가 없으면 메시지를 사이드바에 띄우기
-            if(data.positions.length == 0){
-                html += '<div>검색된 방이 없습니다.</div>'
-            }
+            if(data.positions.length == 0){ html += '<div>검색된 방이 없습니다.</div>' }
 
 
-        //마커 생성
+        //마커목록 생성
           // 데이터에서 좌표 값을 가지고 마커를 표시합니다
           // 마커 클러스터러로 관리할 마커 객체는 생성할 때 지도 객체를 설정하지 않습니다
           var markers = $(data.positions).map(function(i, position) {
-
 
             //마커 하나 생성
             var marker = new kakao.maps.Marker({
@@ -191,3 +188,4 @@ function getroom(rno){
             }
         });
 
+}

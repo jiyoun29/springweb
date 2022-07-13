@@ -1,14 +1,21 @@
 package ezenweb.Service;
 
-import ezenweb.Dto.BoardDto;
 import ezenweb.domain.Board.BoardEntity;
 import ezenweb.domain.Board.BoardRepository;
 import ezenweb.domain.Board.CategoryEntity;
 import ezenweb.domain.Board.CategoryRepository;
 import ezenweb.domain.member.MemberEntity;
 import ezenweb.domain.member.MemberRepository;
+import ezenweb.Dto.BoardDto;
+import ezenweb.Dto.LoginDto;
+import ezenweb.Dto.MemberDto;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,8 +27,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Entity;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +55,9 @@ public class BoardService {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private  MemberService memberService;
+
 
     //1. C [인수 : dto] why? 게시물 dto를 받아야함
     @Transactional
@@ -53,28 +65,29 @@ public class BoardService {
         //1. 세션 호출 (로그인 형변환) [시큐리티 사용시 -> 세션 x-> 인증세션('userdetails vs defaultOAuth2User)]
 //        LoginDto loginDto= (LoginDto) request.getSession().getAttribute("login");
 
-        //1. 인증된 세션 호출[시큐리티 내 인증 결과 호출]
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        //2. 인증 정보 가져오기
-        Object principal = authentication.getPrincipal(); //Principal : 인증 정보
-        //3. 일반 회원 : userdetails, oauth회원 : defaultOAuth2User 구분
-            // java문법 : 자식 객체 instanceof 부모클래스명 : 상속 확인 키워드
-        String mid = null;
-        if(principal instanceof UserDetails){ //인증 정보의 타입이 userdetail이면 [일반 회원 검증]
-            mid = ((UserDetails) principal).getUsername(); //인증정보에서 mid 호출
-        } else if (principal instanceof DefaultOAuth2User){ //인증 정보의 타입이 DefaultOauth2user이면 oauth2회원 검증
-            Map<String, Object> map = ((DefaultOAuth2User) principal).getAttributes();
-            //회원정보 요청키를 이용한 구분 짓기
-            if(map.get("response") != null){ //1. 네이버일 경우 [Attributes에 response 이라는 키가 존재하면]
-                Map<String, Object> map2 = (Map<String, Object>) map.get("response");
-                mid = map2.get("email").toString().split("@")[0];
-            } else { //2. 카카오인 경우
-                Map<String, Object> map2 = (Map<String, Object>) map.get("kakao_account");
-                mid = map2.get("email").toString().split("@")[0];
-            }
+//        //1. 인증된 세션 호출[시큐리티 내 인증 결과 호출]
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        //2. 인증 정보 가져오기
+//        Object principal = authentication.getPrincipal(); //Principal : 인증 정보
+//        //3. 일반 회원 : userdetails, oauth회원 : defaultOAuth2User 구분
+//            // java문법 : 자식 객체 instanceof 부모클래스명 : 상속 확인 키워드
+//        String mid = null;
+//        if(principal instanceof UserDetails){ //인증 정보의 타입이 userdetail이면 [일반 회원 검증]
+//            mid = ((UserDetails) principal).getUsername(); //인증정보에서 mid 호출
+//        } else if (principal instanceof DefaultOAuth2User){ //인증 정보의 타입이 DefaultOauth2user이면 oauth2회원 검증
+//            Map<String, Object> map = ((DefaultOAuth2User) principal).getAttributes();
+//            //회원정보 요청키를 이용한 구분 짓기
+//            if(map.get("response") != null){ //1. 네이버일 경우 [Attributes에 response 이라는 키가 존재하면]
+//                Map<String, Object> map2 = (Map<String, Object>) map.get("response");
+//                mid = map2.get("email").toString().split("@")[0];
+//            } else { //2. 카카오인 경우
+//                Map<String, Object> map2 = (Map<String, Object>) map.get("kakao_account");
+//                mid = map2.get("email").toString().split("@")[0];
+//            }
+//
+//        } else {return  false;} //인증 정보가 없을 경우
 
-        } else {return  false;} //인증 정보가 없을 경우
-
+        String mid = memberService.getloginmid();
 
         if(mid != null){ //로그인이 되어 있으면
             //2.로그인 된 회원의 엔티티 찾기
@@ -114,7 +127,6 @@ public class BoardService {
                         categoryEntity.getBoardEntityList().add(boardEntity);
                         //회원 엔티티에 게시물 연결
                         optionalMember.get().getBoardEntityList().add(boardEntity);
-
                     //5.반환
                     return true;
                 }
@@ -126,8 +138,6 @@ public class BoardService {
     //2. dto -> entity
     //       int bno = boardRepository.save(boardDto.toentity()).getBno(); //save된 bno 반환
 //        if(bno >= 1){return true;} else {return false;}
-
-
 
 
 
@@ -283,6 +293,83 @@ public class BoardService {
             jsonArray.put(object);
         }
         return jsonArray;
+    }
+
+
+
+    // 라이브러리
+    // 1. Connection :  연결된 html 인터페이스
+    //  1. Jsoup.connect( 연결할 URL );
+    //   2. conn.get() : 연결된 HTML 호출
+    // 2. Document : HTML 객체화
+    // 3. Element :
+    // 3. Elements :
+    // 1.   .getElementsByTag( 태그명 )
+    // 2.   .getElementsByClass( 클래스명 )
+    // 3.  .getElementById( id명 )
+    // 4.  .get( 인덱스 )
+    // 5.  .first() : 첫번째 인덱스
+    // 6. .attr( 속성명 ) : 해당 속성의 값 호출
+    // 7. .text() : html 문서내용 호출
+    // 1.  날씨 크롤링
+    public JSONObject getweather(){
+        // 0. java : jsoup 라이브러리 그레이들 빌드
+        // 1. 정보를 가지고 올 URL 작성
+        String url = "https://search.daum.net/search?w=tot&&q=%EB%82%A0%EC%94%A8";
+        // 2. 해당 url를 jsoup 으로 연결 [ jsoup은 해당 url 과 연결 ]
+        Connection conn = Jsoup.connect( url );
+        try {
+            // 3. 해당 url 객체로 가져오기
+            Document document = conn.get();  /* 예외처리 */
+            // 4. 특정 태그 호출
+            String 지역명 = document.getElementsByClass("tit_info").first().text();
+            String 상태 = document.getElementsByClass("txt_weather").first().text();
+            Elements elements = document.getElementsByClass("desc_temp");
+            String 온도 =  elements.get(2).getElementsByClass("txt_temp").first().text();
+            String 풍속 = document.getElementsByClass("dl_weather").get(0).text();
+            String 습도 = document.getElementsByClass("dl_weather").get(1).text();
+            String 미세먼지 = document.getElementsByClass("dl_weather").get(2).text();
+            // 5. 크롤링된 정보를 json 담기 [ js 에서 사용하기 위해서 ]
+            JSONObject object = new JSONObject();
+            object.put("지역명" , 지역명);
+            object.put("상태" , 상태);
+            object.put("온도" , 온도);
+            object.put("풍속" , 풍속);
+            object.put("습도" , 습도);
+            object.put("미세먼지" , 미세먼지);
+            return object;
+        }catch (Exception e) { System.out.println( e ); }
+        return null;
+    }
+    // 2. 부동산 관련 뉴스 크롤링
+    public  JSONArray getnews(){
+        String url = "https://realestate.daum.net/news/all"; // 1.
+        Connection connect =  Jsoup.connect(url); // 2.
+        try {
+            Document document =  connect.get(); // 3.
+            Elements elements =  document.getElementsByClass("list_live"); // 4.
+            Elements tags =  elements.first().getElementsByTag("li"); // 5.
+
+            JSONArray jsonArray = new JSONArray();
+
+            for( int i = 0 ; i<6 ; i++ ){
+                JSONObject object = new JSONObject();
+                String 내용 = tags.get(i).getElementsByClass("cont").first().text();
+                String 사진 = tags.get(i).getElementsByClass("frame_thumb").attr("src");
+                String 링크 = tags.get(i).getElementsByClass("link_thumb").attr("href");
+                object.put("내용" , 내용);
+                object.put("사진" , 사진);
+                object.put("링크" , "https://realestate.daum.net"+링크);
+                jsonArray.put( object );
+            }
+            return jsonArray;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    // 3. 부동산 시세 크롤링
+    public  void getvalue(){
+
     }
 
 

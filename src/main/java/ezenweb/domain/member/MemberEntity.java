@@ -2,6 +2,7 @@ package ezenweb.domain.member;
 
 import ezenweb.domain.BaseTime;
 import ezenweb.domain.Board.BoardEntity;
+import ezenweb.domain.message.MessageEntity;
 import ezenweb.domain.room.RoomEntity;
 import lombok.*;
 
@@ -9,10 +10,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name="member")
-@Builder
-@Getter @Setter
+@Entity @Table(name="member")
+@Builder @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor //풀생성자,빈생서자
 public class MemberEntity extends BaseTime {
 
@@ -44,6 +43,16 @@ public class MemberEntity extends BaseTime {
     @OneToMany( mappedBy = "memberEntity" , cascade = CascadeType.ALL ) //멤버가 여러명의 보드를 가지고 있어야 함
     List<BoardEntity> boardEntityList = new ArrayList<>();
                                 //new를 사용해 메모리 할당
+
+    // 보낸 메시지 리스트
+    @Builder.Default    // 빌더 사용시 초기값 설정
+    @OneToMany( mappedBy ="fromentity" , cascade = CascadeType.ALL)  // 1:M
+            List<MessageEntity> fromentitylist = new ArrayList<>();
+
+    // 받은 메시지 리스트
+    @Builder.Default    // 빌더 사용시 초기값 설정
+    @OneToMany( mappedBy ="toentity" , cascade = CascadeType.ALL)  // 1:M
+            List<MessageEntity> toentitylist = new ArrayList<>();
 
 
 }
