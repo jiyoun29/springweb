@@ -4,7 +4,7 @@ function getfrommsglist(){
     $.ajax({
         url : '/member/getfrommsglist',
         success:function(object){
-//          console.log(object);
+          console.log(object);
             let html="<tr><th>받는사람</th><th>내용</th><th>받은날짜/시간</th></tr>";
 
             for(let i = 0; i<object.length; i++){
@@ -29,6 +29,7 @@ function gettomsglist(){
     $.ajax({
         url : '/member/gettomsglist',
         success:function(object){
+             console.log(object);
             let html="<tr><th>보낸사람</th><th>내용</th><th>받은날짜/시간</th></tr>";
 
             for(let i = 0; i<object.length; i++){
@@ -48,6 +49,8 @@ function gettomsglist(){
     });
 }
 
+let deletelist = []; //삭제할 쪽지의 번호를 저장하는 배열
+
 function msgdelete(){ //현재 deletelist 배열을 ajax controller 전달
     alert("선택된 메세지를 삭제합니다.");
     $.ajax({
@@ -65,17 +68,14 @@ function msgdelete(){ //현재 deletelist 배열을 ajax controller 전달
 
 
 
-let deletelist = []; //삭제할 쪽지의 번호를 저장하는 배열
-
-
 function oncheckbox(){ // 체크박스를 클릭했을때
 //모든 체크된 체크박스 값 가져오기
     //1. 모든 체크박스의 객체 호출
-    let chkboxlist = $("input[name='checkbox']");
+    let chkboxlist = $("input[name='chkbox']"); // 위에 있는 체크박스 이름과 동일해야 합니다..~
     //2. 반복문 이용한 체크된 박스의 value 값을 deletelist 저장
     deletelist = []; //삭제리스트 초기화
     for(let i = 0; i < chkboxlist.length; i++){
-        if(chkboxlist[i].checked == true){ deletelist.push(chkboxlist.value) }
+        if(chkboxlist[i].checked == true){ deletelist.push( chkboxlist[i].value); }  //   코드 확인해보세요~~
     }
 }
 
@@ -85,12 +85,12 @@ function msgread( msgno ){ //해당 메세지 내용을 클릭했을때 상세�
     isread(msgno); //읽음 처리
 }
 
-
 function isread(msgno){ //해당 메세지 번호의 읽음처리 업데이트
+    alert("수정합니다~~   " + msgno );
     $.ajax({
         url : '/member/isread',
         method : 'put',
-        data : {"msgno":msgno}
+        data : {"msgno":msgno} , //   , 빠져 있었네요
         success:function(object){ getisread();  gettomsglist();  }
     });
 }

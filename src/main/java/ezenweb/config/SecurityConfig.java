@@ -48,8 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .ignoringAntMatchers("/board/save") //글쓰기 열어주기
             .ignoringAntMatchers("/room/write") // 방등록
             .ignoringAntMatchers("/room/roomlist") // 지도에 표시할 데이터 요청/응답
-        .ignoringAntMatchers("/member/isread") // 메세지 읽음처리 요청
-
+            .ignoringAntMatchers("/member/isread") // 메세지 읽음처리 요청
+             .ignoringAntMatchers("/member/msgdelete") // 메시지 삭제 요청
                 .and().exceptionHandling() //오류 페이지 발생시 시큐리티가 가지고 옴
                 .accessDeniedPage("/error")
             .and()

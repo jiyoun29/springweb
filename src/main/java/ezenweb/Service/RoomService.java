@@ -103,7 +103,10 @@ public class RoomService {
                     //1.윈도우 운영체제 프로젝트 경로
 //                String dir = "C:\\Users\\504\\IdeaProjects\\springweb\\src\\main\\resources\\static\\upload\\";
                     //2. 리눅수 운영체제 프로젝트 빌더[서버] 경로
-                String dir = "/home/ec2-user/app/springweb/build/resources/main/static/upload/";
+//                String dir = "/home/ec2-user/app/springweb/build/resources/main/static/upload/"; // 배포 했을경우
+
+                String dir = "C:\\Users\\JIYUN\\IdeaProjects\\springweb\\src\\main\\resources\\static\\upload\\";// 집에서 로컬 사용할 경우
+
                         //리눅스 최상위 경로:/home
                         // 리눅스 계정 폴더 : /home/ec2-user
                 //"/home/ec2-user/{폴더명}/{깃 저장소명}/build/resources/main/static";
@@ -201,11 +204,22 @@ public class RoomService {
         double ha = Double.parseDouble(Location.get("ha"));
         double oa = Double.parseDouble(Location.get("oa"));
 
+        int trans = Integer.parseInt(Location.get("trans"));
+        int minprice = Integer.parseInt(Location.get("minprice"));
+        int maxprice = Integer.parseInt(Location.get("maxprice"));
 
-        //1. 모든 엔티티 꺼내오기
-        List<RoomEntity> roomEntityList = roomRepository.findAll();
 
-        //2. 엔티티 -> Map
+
+        //1. 모든 엔티티 꺼내오기!!!!!!!!!!!!!!!
+        List<RoomEntity> roomEntityList = null;
+
+        if(trans == 0){ roomEntityList = roomRepository.search(minprice, maxprice); }
+        else { roomEntityList = roomRepository.search(trans, minprice , maxprice); }
+
+
+
+
+        //2. 엔티티 -> Map -> 리스트add
         for(RoomEntity entity : roomEntityList) { //리스트에서 엔티티 하나씩 꺼내오기
 
             //location 범위 내 좌표만 저장하기

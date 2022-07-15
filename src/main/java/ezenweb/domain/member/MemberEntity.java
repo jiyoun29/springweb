@@ -47,12 +47,12 @@ public class MemberEntity extends BaseTime {
     // 보낸 메시지 리스트
     @Builder.Default    // 빌더 사용시 초기값 설정
     @OneToMany( mappedBy ="fromentity" , cascade = CascadeType.ALL)  // 1:M
-            List<MessageEntity> fromentitylist = new ArrayList<>();
+    List<MessageEntity> fromentitylist = new ArrayList<>();
 
     // 받은 메시지 리스트
     @Builder.Default    // 빌더 사용시 초기값 설정
     @OneToMany( mappedBy ="toentity" , cascade = CascadeType.ALL)  // 1:M
-            List<MessageEntity> toentitylist = new ArrayList<>();
+    List<MessageEntity> toentitylist = new ArrayList<>();
 
 
 }

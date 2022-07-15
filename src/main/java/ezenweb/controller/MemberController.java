@@ -57,7 +57,7 @@ public class MemberController {
 
     /* 기본자료형   vs    클래스명 (래퍼클래스)
          int       vs     Integer
-      사용 용도는 동일하다.
+      사용 용도는 동일하다.(메소드 차이)
     * */
 
 
@@ -164,7 +164,6 @@ public class MemberController {
     public boolean save(MemberDto memberDto){ //자동주입
         //서비스 호출
         boolean result = memberService.signup(memberDto);
-        System.out.println("컨트롤러이메일");
         return result; //성공, 실패를 반환
     }
 
@@ -210,6 +209,7 @@ public class MemberController {
     @DeleteMapping("/msgdelete") //5.선택된 메세지 삭제 처리
     @ResponseBody
     public boolean msgdelete(@RequestBody List<Integer> deletelist){
+        System.out.println("asdasd : " + deletelist );
         return memberService.msgdelete(deletelist);
     }
 

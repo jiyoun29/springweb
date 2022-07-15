@@ -1,0 +1,11 @@
+
+.searchbox{
+    position:fixed; /*화면 내 위치고정*/
+    top : 20%; /*위에서부터 50% 내려옴*/
+    left : 1%; /*왼쪽에서부터 50% 이동*/
+    width : 350px;
+    background-color : rgba(255,255,255,0.8);
+    z-index : 100; /*다른 tag와 겹쳤을 때 우선순위 정함*/
+    border-radius : 10px;
+    padding : 20px;
+}

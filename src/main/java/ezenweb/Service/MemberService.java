@@ -80,29 +80,34 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
                         .getUserInfoEndpoint()
                         .getUserNameAttributeName();
 
-        System.out.println("클라이언트(개발자)가 등록한 이름 : "+registrationId);
-        System.out.println("회원정보(json) 호출 시 사용되는 키 이름 : "+ userNameAttributeName);
-        System.out.println("회원정보(로그인) 결과 내용 : "+oAuth2User.getAttributes());
-
+//        System.out.println("클라이언트(개발자)가 등록한 이름 : "+registrationId);
+//        System.out.println("회원정보(json) 호출 시 사용되는 키 이름 : "+ userNameAttributeName);
+//        System.out.println("회원정보(로그인) 결과 내용 : "+oAuth2User.getAttributes());
 
         //oauth2 정보 -> Dto -> entity -> db저장
         OauthDTO oauthDTO = OauthDTO.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
         //1. 이메일로 엔티티 호출
         Optional<MemberEntity> optional = memberRepository.findBymemail(oauthDTO.getMemail());
+
+        MemberEntity memberEntity = null;
         //2. 만약에 엔티티가 없으면
         if(!optional.isPresent()){
-            memberRepository.save(oauthDTO.toentity()); //dto->entity 저장
+            memberEntity = oauthDTO.toentity();
+            memberRepository.save(memberEntity); //dto->entity 저장
+        } else {
+            memberEntity = optional.get();
         }
 
+        return  new LoginDto(  memberEntity ,
+                Collections.singleton(new SimpleGrantedAuthority(memberEntity.getrolekey())) );
 
         //반환타입 DefaultOAuth2User(권한(role) ,회원인증정보, 회원정보 호출키)
             //DefaultOAuth2User, UserDetail : 반환시 인증 세션 자동부여[SimpleGrantedAuthority(필수)]
-       return new DefaultOAuth2User(
-               Collections.singleton(new SimpleGrantedAuthority("ROLE_MEMBER")), //빨간느낌표 클릳ㄱ 후 자동생성
-               oAuth2User.getAttributes(),
-               userNameAttributeName
-       );
+//       return new DefaultOAuth2User(
+//               Collections.singleton(new SimpleGrantedAuthority("ROLE_MEMBER")), //빨간느낌표 클릳ㄱ 후 자동생성
+//               oAuth2User.getAttributes(),
+//               userNameAttributeName);
     }
 
     /*
@@ -113,7 +118,7 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
     @Override
     public UserDetails loadUserByUsername(String mid) throws UsernameNotFoundException {
         
-        System.out.println(mid); //넘어오는지 테스트
+//        System.out.println(mid); //넘어오는지 테스트
 
         //1. 회원 아이디로 엔티티 찾기
         Optional<MemberEntity> entityOptional = memberRepository.findBymid( mid );
@@ -123,19 +128,15 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
                         2. .orElse : 만약에 optional객체가 비어있으면 반환할 데이터
                         만약 엔티티가 없으면 null 반환
                      */
-        //2. 찾은 회원 엔티티의 권한[키]를 리스트에 담기
-        List<GrantedAuthority> authorityList = new ArrayList<>();
-                //GrantedAuthority : 부여된 인증의 클래스
-                //List<GrantedAuthority> : 부여된 인증들을 모아두기
+//        //2. 찾은 회원 엔티티의 권한[키]를 리스트에 담기
+//        List<GrantedAuthority> authorityList = new ArrayList<>();
+//                //GrantedAuthority : 부여된 인증의 클래스
+//                //List<GrantedAuthority> : 부여된 인증들을 모아두기
+//        System.out.println("권한 키:"+memberEntity.getrolekey());
+//        authorityList.add(new SimpleGrantedAuthority(memberEntity.getrolekey()));
+//            //리스트에 인증된 엔티티의 키를 보관
 
-        System.out.println("권한 키:"+memberEntity.getrolekey());
-
-
-
-        authorityList.add(new SimpleGrantedAuthority(memberEntity.getrolekey()));
-            //리스트에 인증된 엔티티의 키를 보관
-
-        return new LoginDto(memberEntity, authorityList); //회원 엔티티, 인증된 리스트 세션 부여
+        return new LoginDto(memberEntity, Collections.singleton(new SimpleGrantedAuthority(memberEntity.getrolekey())) ); //회원 엔티티, 인증된 리스트 세션 부여
     }
 
 
@@ -178,11 +179,9 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
     
     
     //3. 로그아웃 메소드
-    public void logout(){
-        request.getSession().setAttribute("login",null); //해당 세션을 다시 null로 대입
-
-        
-    }
+//    public void logout(){
+//        request.getSession().setAttribute("login",null); //해당 세션을 다시 null로 대입
+//    }
 
 
     //다른 클래스의 메소드나 필드 호출 방법(* 메모리 할당(객체 만들기))
@@ -217,6 +216,7 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
             mimeMessageHelper.setText(content.toString(),true);
             //5. 메일 전송
             javaMailSender.send(message);
+
         } catch (Exception e) {System.out.println("메일전송실패"+e);}
 
     }
@@ -246,7 +246,7 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
                 char randomchar = (char)(random.nextInt(26)+97); //97~122 //소문자 a->z난수 중 1개 발생
                 authkey.append(randomchar); //생성된 문자 난수들을 하나씩 연결 -> 문자열 만들기
             } //인증코드 전달
-            System.out.println("인증코드"+authkey);
+//            System.out.println("인증코드"+authkey);
             html.append("<a href='http://localhost:8081/member/email/"+authkey+"/"+memberDto.getMid()+"'>이메일 검증</a>");
             html.append("</body></html>");
 
@@ -429,6 +429,8 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
         int mno = memberRepository.findBymid(mid).get().getMno(); //반환타입 int
         count = messageRepository.getisread(mno);
 
+        System.out.println( "asdasdasdasd : " + count );
+
         return count;
     }
 
@@ -442,6 +444,7 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
 
         //json형 변환[js에서 사용하기 위해]
         JSONArray jsonArray = new JSONArray();
+
         for(MessageEntity msg : list){
             JSONObject object = new JSONObject();
             object.put("msgno", msg.getMsgno());
@@ -476,13 +479,19 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
         }
         return jsonArray;
     }
+
     //읽음 처리 메소드[수정] 해당 메시지번호 엔티티의 읽음여부 수정
     @Transactional
     public boolean isread( int msgno ){
         //해당 메시지 번호 엔티티의 읽음 여부 수정
-        memberRepository.findById(msgno).get().setIsread(true);
+        messageRepository.findById(msgno).get().setIsread(true);
+       // 멤버가 아니고 메시지 입니다~~
         return true;
     }
+
+
+    //두가지를 읽어오지 못함함
+
 
     //선택된 메세지 삭제
     @Transactional
@@ -490,7 +499,7 @@ public class MemberService implements UserDetailsService, OAuth2UserService<OAut
 
         //1. 반복문 이용한 모든 엔티티 호출
         for(int msgno : deletelist){
-            MessageEntity entity = memberRepository.findBymid(msgno).get();
+            MessageEntity entity = messageRepository.findById(msgno).get();
             messageRepository.delete(entity);
         }
         return true;

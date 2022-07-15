@@ -42,6 +42,7 @@ public class MsgWebSocketHandler extends TextWebSocketHandler {
 
         // DB 처리
         memberService.messagesend( object );
+
         // 현재 접속된 세션들중에 받는사람(to) 와 같은경우 소켓 메시지 전달
         for( WebSocketSession socketSession : list.keySet()  ){    // 모든 키값 호출
             if( list.get( socketSession).equals( object.get("to")  ) ){

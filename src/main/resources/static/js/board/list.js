@@ -106,7 +106,7 @@ function category_list() {
             let html = "";
             for(let i = 0 ; i<categorylist.length; i++){
             html +=
-                '<button onclick="board_list('+categorylist[i].cno+')">'+categorylist[i].cname+'</button>'
+                '<button onclick="categorybtn('+categorylist[i].cno+')">'+categorylist[i].cname+'</button>'
             }
             $("#categorybox").html( html );
         }

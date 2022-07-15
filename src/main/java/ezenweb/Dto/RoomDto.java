@@ -30,8 +30,8 @@ public class RoomDto {
         //2. 빌드패턴 [빌더에 포함되지 않는 필드는 0 또는 null]
         //3. ModelMapper 라이브러리리
 
-   private String rtrans; //거래방식(전세/월세/매매)
-    private String rprice; //가격
+   private int rtrans; //거래방식(전세/월세/매매)
+    private int rprice; //가격
     private String rarea; //면적
     private String rmanagmentfee; //관리비
     private String rstructure; //구조

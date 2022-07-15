@@ -1,13 +1,13 @@
 
 getisread();
 
-
 //안 읽은 쪽지 개수 호출 메소드
 function getisread(){
     $.ajax({
         url : '/member/getisread',
         success : function(object){
-            $("#msgisreadbox".html(object+"+"))
+            $("#msgisreadbox").html(object+"+");
+                    // 소괄호 빠져있었네요~
         }
     });
 }

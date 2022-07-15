@@ -25,8 +25,11 @@ public class RoomEntity extends BaseTime { //Entity : 객체
     private String rlon;   //위도
     //dto와 맞춘다
 
-    private String rtrans; //거래방식(전세/월세/매매)
-    private String rprice; //가격
+    private int rtrans; //거래방식(전세/월세/매매)
+    private int rprice; //가격[만원단위
+
+//    private String rtrans; //거래방식(전세/월세/매매)
+//    private String rprice; //가격
     private String rarea; //면적
     private String rmanagmentfee; //관리비
     private String rstructure; //구조

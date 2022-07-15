@@ -100,6 +100,11 @@ public class BoardController  {
             @RequestParam("keyword") String keyword ,
             @RequestParam("page") int page  ){
 
+        System.out.println(  cno   );
+        System.out.println(  key   );
+        System.out.println(  keyword   );
+        System.out.println(  page   );
+
         try {
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
